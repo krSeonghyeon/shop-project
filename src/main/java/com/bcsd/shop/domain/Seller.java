@@ -19,7 +19,7 @@ public class Seller {
     @Column(name = "id")
     private Long id;
 
-    @OneToOne // 데이터베이스 ON DELETE CASCADE, 양방향 관계 회피
+    @OneToOne(fetch = FetchType.LAZY) // 데이터베이스 ON DELETE CASCADE, 양방향 관계 회피
     @JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false)
     private User user;
 
