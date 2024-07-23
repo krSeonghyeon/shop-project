@@ -1,9 +1,7 @@
 package com.bcsd.shop.domain;
 
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.LocalDateTime;
 import java.util.HashSet;
@@ -14,7 +12,9 @@ import java.util.Set;
         @UniqueConstraint(columnNames = "email", name = "UK_USER_EMAIL")
 })
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor
 @Getter
+@Builder
 public class User {
 
     @Id
@@ -41,5 +41,13 @@ public class User {
     private LocalDateTime createdAt;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @Builder.Default
     private Set<UserAuthority> authorities = new HashSet<>();
+
+    public void addAuthority(UserAuthority userAuthority) {
+        if (!authorities.contains(userAuthority)) {
+            authorities.add(userAuthority);
+            userAuthority.setUser(this);
+        }
+    }
 }
