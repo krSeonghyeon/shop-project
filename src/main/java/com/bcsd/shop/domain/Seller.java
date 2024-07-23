@@ -1,9 +1,7 @@
 package com.bcsd.shop.domain;
 
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Entity
 @Table(name = "seller", uniqueConstraints = {
@@ -11,7 +9,9 @@ import lombok.NoArgsConstructor;
         @UniqueConstraint(columnNames = "business_number", name = "UK_SELLER_BUSINESS_NUMBER")
 })
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor
 @Getter
+@Builder
 public class Seller {
 
     @Id

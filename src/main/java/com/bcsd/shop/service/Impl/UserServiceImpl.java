@@ -1,11 +1,15 @@
 package com.bcsd.shop.service.Impl;
 
+import com.bcsd.shop.controller.dto.request.SellerJoinRequest;
 import com.bcsd.shop.controller.dto.request.UserJoinRequest;
+import com.bcsd.shop.controller.dto.response.SellerInfoResponse;
 import com.bcsd.shop.controller.dto.response.UserInfoResponse;
 import com.bcsd.shop.domain.Authority;
+import com.bcsd.shop.domain.Seller;
 import com.bcsd.shop.domain.User;
 import com.bcsd.shop.domain.UserAuthority;
 import com.bcsd.shop.repository.AuthorityRepository;
+import com.bcsd.shop.repository.SellerRepository;
 import com.bcsd.shop.repository.UserAuthorityRepository;
 import com.bcsd.shop.repository.UserRepository;
 import com.bcsd.shop.service.UserService;
@@ -25,6 +29,7 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final AuthorityRepository authorityRepository;
     private final UserAuthorityRepository userAuthorityRepository;
+    private final SellerRepository sellerRepository;
     private final PasswordEncoder passwordEncoder;
 
     @Override
@@ -51,9 +56,45 @@ public class UserServiceImpl implements UserService {
         return UserInfoResponse.from(savedUser);
     }
 
+    @Override
+    @Transactional
+    public SellerInfoResponse joinSeller(SellerJoinRequest request) {
+        if (userRepository.existsByEmail(request.email())) {
+            throw new DataIntegrityViolationException("이미 사용 중인 이메일 입니다.");
+        }
+
+        if (sellerRepository.existsByBusinessNumber(request.businessNumber())) {
+            throw new DataIntegrityViolationException("이미 사용 중인 사업자 등록 번호 입니다.");
+        }
+
+        String encodedPassword = passwordEncoder.encode(request.password());
+
+        User newUser = User.builder()
+                .email(request.email())
+                .password(encodedPassword)
+                .name(request.name())
+                .phoneNumber(request.phoneNumber())
+                .address(request.address())
+                .build();
+
+        User savedUser = userRepository.saveAndRefresh(newUser);
+
+        assignAuthorityToUser(savedUser, "SELLER");
+
+        Seller newSeller = Seller.builder()
+                .user(savedUser)
+                .companyName(request.companyName())
+                .businessNumber(request.businessNumber())
+                .build();
+
+        Seller savedSeller = sellerRepository.save(newSeller);
+
+        return SellerInfoResponse.of(savedUser, savedSeller);
+    }
+
     private void assignAuthorityToUser(User user, String authorityType) {
         Authority authority = authorityRepository.findByType(authorityType)
-                .orElseThrow(() -> new NoSuchElementException(authorityType +" 권한이 존재하지 않습니다"));
+                .orElseThrow(() -> new NoSuchElementException(authorityType + " 권한이 존재하지 않습니다"));
 
         UserAuthority userAuthority = UserAuthority.builder()
                 .user(user)
