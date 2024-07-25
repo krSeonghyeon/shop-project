@@ -19,10 +19,17 @@ public class UserController {
     private final UserService userService;
 
     @GetMapping("/info")
-    public ResponseEntity<?> getUserInfo(
+    public ResponseEntity<UserInfoResponse> getUserInfo(
             @SessionAttribute(name = "userId") Long userId
     ) {
         return ResponseEntity.ok(userService.getUserInfo(userId));
+    }
+
+    @GetMapping("/info/seller")
+    public ResponseEntity<SellerInfoResponse> getSellerInfo(
+            @SessionAttribute(name = "userId") Long userId
+    ) {
+        return ResponseEntity.ok(userService.getSellerInfo(userId));
     }
 
     @PostMapping("/join")

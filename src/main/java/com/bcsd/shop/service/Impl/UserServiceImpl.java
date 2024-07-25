@@ -34,18 +34,22 @@ public class UserServiceImpl implements UserService {
     private final PasswordEncoder passwordEncoder;
 
     @Override
-    public Object getUserInfo(Long userId) {
+    public UserInfoResponse getUserInfo(Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException("존재하지 않는 회원입니다."));
 
-        Seller seller = sellerRepository.findByUserId(userId).orElse(null);
-        System.out.println(seller);
+        return UserInfoResponse.from(user);
+    }
 
-        if (seller != null) {
-            return SellerInfoResponse.of(user, seller);
-        } else {
-            return UserInfoResponse.from(user);
-        }
+    @Override
+    public SellerInfoResponse getSellerInfo(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException("존재하지 않는 회원입니다."));
+
+        Seller seller = sellerRepository.findByUserId(userId)
+                .orElseThrow(() -> new EntityNotFoundException("존재하지 않는 판매자입니다."));
+
+        return SellerInfoResponse.of(user, seller);
     }
 
     @Override
