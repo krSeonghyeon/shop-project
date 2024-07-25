@@ -7,6 +7,7 @@ import com.bcsd.shop.controller.dto.response.UserInfoResponse;
 
 public interface UserService {
 
+    Object getUserInfo(Long userId);
     UserInfoResponse join(UserJoinRequest request);
     SellerInfoResponse joinSeller(SellerJoinRequest request);
 }

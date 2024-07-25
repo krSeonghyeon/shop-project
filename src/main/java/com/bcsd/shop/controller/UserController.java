@@ -18,6 +18,13 @@ public class UserController {
 
     private final UserService userService;
 
+    @GetMapping("/info")
+    public ResponseEntity<?> getUserInfo(
+            @SessionAttribute(name = "userId") Long userId
+    ) {
+        return ResponseEntity.ok(userService.getUserInfo(userId));
+    }
+
     @PostMapping("/join")
     public ResponseEntity<UserInfoResponse> join(@RequestBody @Valid UserJoinRequest request) {
         UserInfoResponse response = userService.join(request);

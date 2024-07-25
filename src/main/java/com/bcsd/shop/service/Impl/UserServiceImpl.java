@@ -13,6 +13,7 @@ import com.bcsd.shop.repository.SellerRepository;
 import com.bcsd.shop.repository.UserAuthorityRepository;
 import com.bcsd.shop.repository.UserRepository;
 import com.bcsd.shop.service.UserService;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -31,6 +32,21 @@ public class UserServiceImpl implements UserService {
     private final UserAuthorityRepository userAuthorityRepository;
     private final SellerRepository sellerRepository;
     private final PasswordEncoder passwordEncoder;
+
+    @Override
+    public Object getUserInfo(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException("존재하지 않는 회원입니다."));
+
+        Seller seller = sellerRepository.findByUserId(userId).orElse(null);
+        System.out.println(seller);
+
+        if (seller != null) {
+            return SellerInfoResponse.of(user, seller);
+        } else {
+            return UserInfoResponse.from(user);
+        }
+    }
 
     @Override
     @Transactional
