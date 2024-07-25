@@ -1,5 +1,6 @@
 package com.bcsd.shop.controller;
 
+import com.bcsd.shop.controller.dto.request.PasswordModifyRequest;
 import com.bcsd.shop.controller.dto.request.SellerJoinRequest;
 import com.bcsd.shop.controller.dto.request.UserJoinRequest;
 import com.bcsd.shop.controller.dto.response.SellerInfoResponse;
@@ -42,6 +43,15 @@ public class UserController {
     public ResponseEntity<SellerInfoResponse> joinSeller(@RequestBody @Valid SellerJoinRequest request) {
         SellerInfoResponse response = userService.joinSeller(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
+
+    @PutMapping("/modify/password")
+    public ResponseEntity<Void> modifyPassword(
+            @SessionAttribute(name = "userId") Long userId,
+            @RequestBody @Valid PasswordModifyRequest request
+    ) {
+        userService.modifyPassword(userId, request);
+        return ResponseEntity.ok().build();
     }
 
     @DeleteMapping("/delete")

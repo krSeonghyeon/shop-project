@@ -50,4 +50,8 @@ public class User {
             userAuthority.setUser(this);
         }
     }
+
+    public void changePassword(String newPassword) {
+        this.password = newPassword;
+    }
 }

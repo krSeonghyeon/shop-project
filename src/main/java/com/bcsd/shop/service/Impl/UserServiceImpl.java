@@ -1,5 +1,6 @@
 package com.bcsd.shop.service.Impl;
 
+import com.bcsd.shop.controller.dto.request.PasswordModifyRequest;
 import com.bcsd.shop.controller.dto.request.SellerJoinRequest;
 import com.bcsd.shop.controller.dto.request.UserJoinRequest;
 import com.bcsd.shop.controller.dto.response.SellerInfoResponse;
@@ -16,6 +17,7 @@ import com.bcsd.shop.service.UserService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -110,6 +112,20 @@ public class UserServiceImpl implements UserService {
         Seller savedSeller = sellerRepository.save(newSeller);
 
         return SellerInfoResponse.of(savedUser, savedSeller);
+    }
+
+    @Override
+    @Transactional
+    public void modifyPassword(Long userId, PasswordModifyRequest request) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException("존재하지 않는 회원입니다."));
+
+        if (!passwordEncoder.matches(request.oldPassword(), user.getPassword())) {
+            throw new IllegalArgumentException("현재 비밀번호가 틀렸습니다.");
+        }
+
+        String newPassword = passwordEncoder.encode(request.newPassword());
+        user.changePassword(newPassword);
     }
 
     @Override
