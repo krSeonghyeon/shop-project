@@ -20,33 +20,33 @@ public class UserController {
 
     private final UserService userService;
 
-    @GetMapping("/info")
+    @GetMapping
     public ResponseEntity<UserInfoResponse> getUserInfo(
             @SessionAttribute(name = "userId") Long userId
     ) {
         return ResponseEntity.ok(userService.getUserInfo(userId));
     }
 
-    @GetMapping("/info/seller")
+    @GetMapping("/seller")
     public ResponseEntity<SellerInfoResponse> getSellerInfo(
             @SessionAttribute(name = "userId") Long userId
     ) {
         return ResponseEntity.ok(userService.getSellerInfo(userId));
     }
 
-    @PostMapping("/join")
-    public ResponseEntity<UserInfoResponse> join(@RequestBody @Valid UserJoinRequest request) {
+    @PostMapping
+    public ResponseEntity<UserInfoResponse> joinUser(@RequestBody @Valid UserJoinRequest request) {
         UserInfoResponse response = userService.join(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
-    @PostMapping("/join/seller")
+    @PostMapping("/seller")
     public ResponseEntity<SellerInfoResponse> joinSeller(@RequestBody @Valid SellerJoinRequest request) {
         SellerInfoResponse response = userService.joinSeller(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
-    @PutMapping("/modify/password")
+    @PutMapping("/password")
     public ResponseEntity<Void> modifyPassword(
             @SessionAttribute(name = "userId") Long userId,
             @RequestBody @Valid PasswordModifyRequest request
@@ -55,7 +55,7 @@ public class UserController {
         return ResponseEntity.ok().build();
     }
 
-    @PutMapping("modify/info")
+    @PutMapping("/info")
     public ResponseEntity<UserInfoResponse> modifyUserInfo(
             @SessionAttribute(name = "userId") Long userId,
             @RequestBody @Valid UserInfoModifyRequest request
@@ -64,7 +64,7 @@ public class UserController {
         return ResponseEntity.ok(response);
     }
 
-    @DeleteMapping("/delete")
+    @DeleteMapping
     public ResponseEntity<Void> deleteUser(
             @SessionAttribute(name = "userId") Long userId
     ) {
