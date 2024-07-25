@@ -2,6 +2,7 @@ package com.bcsd.shop.service.Impl;
 
 import com.bcsd.shop.controller.dto.request.PasswordModifyRequest;
 import com.bcsd.shop.controller.dto.request.SellerJoinRequest;
+import com.bcsd.shop.controller.dto.request.UserInfoModifyRequest;
 import com.bcsd.shop.controller.dto.request.UserJoinRequest;
 import com.bcsd.shop.controller.dto.response.SellerInfoResponse;
 import com.bcsd.shop.controller.dto.response.UserInfoResponse;
@@ -126,6 +127,15 @@ public class UserServiceImpl implements UserService {
 
         String newPassword = passwordEncoder.encode(request.newPassword());
         user.changePassword(newPassword);
+    }
+
+    @Override
+    public UserInfoResponse modifyUserInfo(Long userId, UserInfoModifyRequest request) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException("존재하지 않는 회원입니다."));
+
+        user.changeUserInfo(request.phoneNumber(), request.address());
+        return UserInfoResponse.from(user);
     }
 
     @Override

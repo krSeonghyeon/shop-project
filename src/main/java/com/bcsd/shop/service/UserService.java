@@ -2,6 +2,7 @@ package com.bcsd.shop.service;
 
 import com.bcsd.shop.controller.dto.request.PasswordModifyRequest;
 import com.bcsd.shop.controller.dto.request.SellerJoinRequest;
+import com.bcsd.shop.controller.dto.request.UserInfoModifyRequest;
 import com.bcsd.shop.controller.dto.request.UserJoinRequest;
 import com.bcsd.shop.controller.dto.response.SellerInfoResponse;
 import com.bcsd.shop.controller.dto.response.UserInfoResponse;
@@ -13,5 +14,6 @@ public interface UserService {
     UserInfoResponse join(UserJoinRequest request);
     SellerInfoResponse joinSeller(SellerJoinRequest request);
     void modifyPassword(Long userId, PasswordModifyRequest request);
+    UserInfoResponse modifyUserInfo(Long userId, UserInfoModifyRequest request);
     void deleteUser(Long userId);
 }

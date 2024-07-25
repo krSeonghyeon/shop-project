@@ -2,6 +2,7 @@ package com.bcsd.shop.controller;
 
 import com.bcsd.shop.controller.dto.request.PasswordModifyRequest;
 import com.bcsd.shop.controller.dto.request.SellerJoinRequest;
+import com.bcsd.shop.controller.dto.request.UserInfoModifyRequest;
 import com.bcsd.shop.controller.dto.request.UserJoinRequest;
 import com.bcsd.shop.controller.dto.response.SellerInfoResponse;
 import com.bcsd.shop.controller.dto.response.UserInfoResponse;
@@ -52,6 +53,15 @@ public class UserController {
     ) {
         userService.modifyPassword(userId, request);
         return ResponseEntity.ok().build();
+    }
+
+    @PutMapping("modify/info")
+    public ResponseEntity<UserInfoResponse> modifyUserInfo(
+            @SessionAttribute(name = "userId") Long userId,
+            @RequestBody @Valid UserInfoModifyRequest request
+    ) {
+        UserInfoResponse response = userService.modifyUserInfo(userId, request);
+        return ResponseEntity.ok(response);
     }
 
     @DeleteMapping("/delete")
