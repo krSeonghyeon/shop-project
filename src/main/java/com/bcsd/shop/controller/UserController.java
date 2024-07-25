@@ -43,4 +43,12 @@ public class UserController {
         SellerInfoResponse response = userService.joinSeller(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
+
+    @DeleteMapping("/delete")
+    public ResponseEntity<Void> deleteUser(
+            @SessionAttribute(name = "userId") Long userId
+    ) {
+        userService.deleteUser(userId);
+        return ResponseEntity.noContent().build();
+    }
 }

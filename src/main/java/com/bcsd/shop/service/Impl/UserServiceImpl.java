@@ -112,6 +112,16 @@ public class UserServiceImpl implements UserService {
         return SellerInfoResponse.of(savedUser, savedSeller);
     }
 
+    @Override
+    @Transactional
+    public void deleteUser(Long userId) {
+        if (!userRepository.existsById(userId)) {
+            throw new EntityNotFoundException("존재하지 않는 회원입니다.");
+        }
+
+        userRepository.deleteById(userId);
+    }
+
     private void assignAuthorityToUser(User user, String authorityType) {
         Authority authority = authorityRepository.findByType(authorityType)
                 .orElseThrow(() -> new NoSuchElementException(authorityType + " 권한이 존재하지 않습니다"));

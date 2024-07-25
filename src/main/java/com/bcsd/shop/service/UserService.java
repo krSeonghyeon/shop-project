@@ -11,4 +11,5 @@ public interface UserService {
     SellerInfoResponse getSellerInfo(Long userId);
     UserInfoResponse join(UserJoinRequest request);
     SellerInfoResponse joinSeller(SellerJoinRequest request);
+    void deleteUser(Long userId);
 }
