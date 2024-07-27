@@ -2,6 +2,7 @@ package com.bcsd.shop.domain;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.security.core.GrantedAuthority;
 
 @Entity
 @Table(name = "user_authority", uniqueConstraints = {
@@ -11,7 +12,8 @@ import lombok.*;
 @AllArgsConstructor
 @Getter
 @Builder
-public class UserAuthority {
+@ToString
+public class UserAuthority implements GrantedAuthority {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -31,5 +33,10 @@ public class UserAuthority {
             this.user = user;
             user.getAuthorities().add(this);
         }
+    }
+
+    @Override
+    public String getAuthority() {
+        return authority.getType();
     }
 }

@@ -2,6 +2,7 @@ package com.bcsd.shop.controller.dto.response;
 
 import com.bcsd.shop.domain.Seller;
 import com.bcsd.shop.domain.User;
+import com.bcsd.shop.domain.UserAuthority;
 import com.fasterxml.jackson.annotation.JsonFormat;
 
 import java.time.LocalDateTime;
@@ -23,7 +24,7 @@ public record SellerInfoResponse(
 ) {
     public static SellerInfoResponse of(User user, Seller seller) {
         Set<String> authorities = user.getAuthorities().stream()
-                .map(authority -> authority.getAuthority().getType())
+                .map(UserAuthority::getAuthority)
                 .collect(Collectors.toSet());
 
         return new SellerInfoResponse(
