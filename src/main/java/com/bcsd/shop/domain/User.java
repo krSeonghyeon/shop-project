@@ -41,7 +41,6 @@ public class User {
     private LocalDateTime createdAt;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
-    @Builder.Default
     private Set<UserAuthority> authorities = new HashSet<>();
 
     public void addAuthority(UserAuthority userAuthority) {
