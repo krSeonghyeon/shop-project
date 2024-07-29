@@ -39,10 +39,10 @@ public class Product {
     @Column(name = "price", nullable = false, columnDefinition = "BIGINT UNSIGNED")
     private Long price;
 
-    @Column(name = "shipping_cost", nullable = false, columnDefinition = "INT UNSIGNED DEFAULT 0")
+    @Column(name = "shipping_cost", nullable = false, columnDefinition = "INT UNSIGNED")
     private Integer shippingCost;
 
-    @Column(name = "stock", nullable = false, columnDefinition = "INT UNSIGNED DEFAULT 0")
+    @Column(name = "stock", nullable = false, columnDefinition = "INT UNSIGNED")
     private Integer stock;
 
     @Enumerated(EnumType.STRING)
@@ -54,4 +54,24 @@ public class Product {
 
     @Column(name = "updated_at", nullable = false, insertable = false, updatable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")
     private LocalDateTime updatedAt;
+
+    public void changeProductInfo(
+            Category newCategory,
+            String newName,
+            String newImage,
+            String newDescription,
+            Long newPrice,
+            Integer newShippingCost,
+            Integer newStock,
+            ProductStatus newStatus
+    ) {
+        this.category = newCategory;
+        this.name = newName;
+        this.image = newImage;
+        this.description = newDescription;
+        this.price = newPrice;
+        this.shippingCost = newShippingCost;
+        this.stock = newStock;
+        this.status = newStatus;
+    }
 }

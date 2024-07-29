@@ -1,6 +1,7 @@
 package com.bcsd.shop.controller;
 
 import com.bcsd.shop.controller.dto.request.ProductCreateRequest;
+import com.bcsd.shop.controller.dto.request.ProductModifyRequest;
 import com.bcsd.shop.controller.dto.response.ProductInfoResponse;
 import com.bcsd.shop.service.ProductService;
 import jakarta.validation.Valid;
@@ -30,6 +31,16 @@ public class ProductController {
     ) {
         ProductInfoResponse response = productService.createProduct(userId, request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<ProductInfoResponse> modifyProduct(
+            @SessionAttribute(name = "userId") Long userId,
+            @PathVariable Long id,
+            @RequestBody @Valid ProductModifyRequest request
+    ) {
+        ProductInfoResponse response = productService.modifyProduct(userId, id, request);
+        return ResponseEntity.ok(response);
     }
 
     @DeleteMapping("/{id}")

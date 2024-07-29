@@ -1,11 +1,12 @@
 package com.bcsd.shop.controller.dto.request;
 
+import com.bcsd.shop.domain.ProductStatus;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
-public record ProductCreateRequest(
+public record ProductModifyRequest(
         Long categoryId,
 
         @NotBlank(message = "상품명은 비어있을 수 없습니다")
@@ -27,6 +28,9 @@ public record ProductCreateRequest(
 
         @NotNull(message = "재고는 비어있을 수 없습니다")
         @Min(value = 0, message = "재고는 0이상이어야 합니다")
-        Integer stock
+        Integer stock,
+
+        @NotNull(message = "상품상태는 비어있을 수 없습니다")
+        ProductStatus status
 ) {
 }
