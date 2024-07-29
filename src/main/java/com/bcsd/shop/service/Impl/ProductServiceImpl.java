@@ -11,6 +11,7 @@ import com.bcsd.shop.repository.UserRepository;
 import com.bcsd.shop.service.ProductService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -57,5 +58,20 @@ public class ProductServiceImpl implements ProductService {
         Product savedProduct = productRepository.saveAndRefresh(newProduct);
 
         return ProductInfoResponse.of(savedProduct, user, category);
+    }
+
+    @Override
+    @Transactional
+    public void deleteProduct(Long userId, Long id) {
+        Product product = productRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("존재하지 않는 상품입니다"));
+
+        User seller = product.getSeller();
+
+        if (!seller.getId().equals(userId)) {
+            throw new AccessDeniedException("해당 상품의 판매자가 아닙니다");
+        }
+
+        productRepository.deleteById(id);
     }
 }

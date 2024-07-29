@@ -31,4 +31,13 @@ public class ProductController {
         ProductInfoResponse response = productService.createProduct(userId, request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteProduct(
+            @SessionAttribute(name = "userId") Long userId,
+            @PathVariable Long id
+    ) {
+        productService.deleteProduct(userId, id);
+        return ResponseEntity.noContent().build();
+    }
 }

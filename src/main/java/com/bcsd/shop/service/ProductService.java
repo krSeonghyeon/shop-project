@@ -7,4 +7,5 @@ public interface ProductService {
 
     ProductInfoResponse getProductInfo(Long id);
     ProductInfoResponse createProduct(Long userId, ProductCreateRequest request);
+    void deleteProduct(Long userId, Long id);
 }
