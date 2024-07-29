@@ -24,6 +24,17 @@ public class ProductServiceImpl implements ProductService {
     private final UserRepository userRepository;
 
     @Override
+    public ProductInfoResponse getProductInfo(Long id) {
+        Product product = productRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("존재하지 않는 상품입니다"));
+
+        User seller = product.getSeller();
+        Category category = product.getCategory();
+
+        return ProductInfoResponse.of(product, seller, category);
+    }
+
+    @Override
     @Transactional
     public ProductInfoResponse createProduct(Long userId, ProductCreateRequest request) {
         Category category = categoryRepository.findById(request.categoryId())

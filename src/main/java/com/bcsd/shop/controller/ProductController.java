@@ -8,10 +8,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.SessionAttribute;
+import org.springframework.web.bind.annotation.*;
 
 @Controller
 @RequiredArgsConstructor
@@ -19,6 +16,12 @@ import org.springframework.web.bind.annotation.SessionAttribute;
 public class ProductController {
 
     private final ProductService productService;
+
+    @GetMapping("/{id}")
+    public ResponseEntity<ProductInfoResponse> getProduct(@PathVariable Long id) {
+        ProductInfoResponse response = productService.getProductInfo(id);
+        return ResponseEntity.ok(response);
+    }
 
     @PostMapping
     public ResponseEntity<ProductInfoResponse> createProduct(
