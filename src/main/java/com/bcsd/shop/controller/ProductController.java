@@ -2,7 +2,9 @@ package com.bcsd.shop.controller;
 
 import com.bcsd.shop.controller.dto.request.ProductCreateRequest;
 import com.bcsd.shop.controller.dto.request.ProductModifyRequest;
+import com.bcsd.shop.controller.dto.request.ProductSearchRequest;
 import com.bcsd.shop.controller.dto.response.ProductInfoResponse;
+import com.bcsd.shop.controller.dto.response.ProductSimpleInfoResponse;
 import com.bcsd.shop.service.ProductService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +21,14 @@ import java.util.List;
 public class ProductController {
 
     private final ProductService productService;
+
+    @GetMapping("/search")
+    public ResponseEntity<List<ProductSimpleInfoResponse>> searchProducts(
+            @ModelAttribute @Valid ProductSearchRequest request
+    ) {
+        List<ProductSimpleInfoResponse> response = productService.searchProducts(request);
+        return ResponseEntity.ok(response);
+    }
 
     @GetMapping("/{id}")
     public ResponseEntity<ProductInfoResponse> getProduct(@PathVariable Long id) {

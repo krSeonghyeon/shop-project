@@ -2,16 +2,20 @@ package com.bcsd.shop.service.Impl;
 
 import com.bcsd.shop.controller.dto.request.ProductCreateRequest;
 import com.bcsd.shop.controller.dto.request.ProductModifyRequest;
+import com.bcsd.shop.controller.dto.request.ProductSearchRequest;
 import com.bcsd.shop.controller.dto.response.ProductInfoResponse;
-import com.bcsd.shop.domain.Category;
-import com.bcsd.shop.domain.Product;
-import com.bcsd.shop.domain.User;
+import com.bcsd.shop.controller.dto.response.ProductSimpleInfoResponse;
+import com.bcsd.shop.domain.*;
 import com.bcsd.shop.repository.CategoryRepository;
 import com.bcsd.shop.repository.ProductRepository;
 import com.bcsd.shop.repository.UserRepository;
 import com.bcsd.shop.service.ProductService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,6 +30,62 @@ public class ProductServiceImpl implements ProductService {
     private final ProductRepository productRepository;
     private final CategoryRepository categoryRepository;
     private final UserRepository userRepository;
+
+    @Override
+    public List<ProductSimpleInfoResponse> searchProducts(ProductSearchRequest request) {
+        Pageable pageable = PageRequest.of(
+                request.page(), request.listSize(),
+                getSort(request.getSorter())
+        );
+
+        Specification<Product> specification = Specification.where(nameContains(request.q()))
+                .and(categoryEquals(request.categoryId()))
+                .and(priceBetween(request.minPrice(), request.maxPrice()))
+                .and(statusEquals(request.status()));
+
+        List<Product> products = productRepository.findAll(specification, pageable).getContent();
+
+        return products.stream()
+                .map(ProductSimpleInfoResponse::from)
+                .toList();
+    }
+
+    private Sort getSort(Sorter sorter) {
+        return switch (sorter) {
+            case SALE_PRICE_ASC -> Sort.by(Sort.Direction.ASC, "price");
+            case SALE_PRICE_DESC -> Sort.by(Sort.Direction.DESC, "price");
+            case LATEST -> Sort.by(Sort.Direction.DESC, "updatedAt");
+        };
+    }
+
+    private Specification<Product> nameContains(String name) {
+        return (root, query, criteriaBuilder) ->
+                name == null ? null : criteriaBuilder.like(root.get("name"), "%" + name + "%");
+    }
+
+    private Specification<Product> categoryEquals(Long categoryId) {
+        return (root, query, criteriaBuilder) ->
+                categoryId == null ? null : criteriaBuilder.equal(root.get("category").get("id"), categoryId);
+    }
+
+    private Specification<Product> priceBetween(Long minPrice, Long maxPrice) {
+        return (root, query, criteriaBuilder) -> {
+            if (minPrice != null && maxPrice != null) {
+                return criteriaBuilder.between(root.get("price"), minPrice, maxPrice);
+            } else if (minPrice != null) {
+                return criteriaBuilder.greaterThanOrEqualTo(root.get("price"), minPrice);
+            } else if (maxPrice != null) {
+                return criteriaBuilder.lessThanOrEqualTo(root.get("price"), maxPrice);
+            } else {
+                return null;
+            }
+        };
+    }
+
+    private Specification<Product> statusEquals(ProductStatus status) {
+        return (root, query, criteriaBuilder) ->
+                status == null ? null : criteriaBuilder.equal(root.get("status"), status);
+    }
 
     @Override
     public List<ProductInfoResponse> getProductsByUserId(Long userId) {
