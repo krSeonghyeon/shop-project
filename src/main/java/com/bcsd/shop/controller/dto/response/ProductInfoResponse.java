@@ -1,9 +1,7 @@
 package com.bcsd.shop.controller.dto.response;
 
-import com.bcsd.shop.domain.Category;
 import com.bcsd.shop.domain.Product;
 import com.bcsd.shop.domain.ProductStatus;
-import com.bcsd.shop.domain.User;
 import com.fasterxml.jackson.annotation.JsonFormat;
 
 import java.time.LocalDateTime;
@@ -26,11 +24,11 @@ public record ProductInfoResponse (
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     LocalDateTime updatedAt
 ) {
-    public static ProductInfoResponse of(Product product, User user, Category category) {
+    public static ProductInfoResponse from(Product product) {
         return new ProductInfoResponse(
                 product.getId(),
-                category.getName(),
-                user.getName(),
+                product.getCategory().getName(),
+                product.getSeller().getName(),
                 product.getName(),
                 product.getImage(),
                 product.getDescription(),

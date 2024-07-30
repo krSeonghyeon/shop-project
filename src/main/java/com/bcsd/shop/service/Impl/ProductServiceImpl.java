@@ -16,6 +16,8 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -26,14 +28,19 @@ public class ProductServiceImpl implements ProductService {
     private final UserRepository userRepository;
 
     @Override
+    public List<ProductInfoResponse> getProductsByUserId(Long userId) {
+        List<Product> products = productRepository.findAllBySellerId(userId);
+        return products.stream()
+                .map(ProductInfoResponse::from)
+                .toList();
+    }
+
+    @Override
     public ProductInfoResponse getProductInfo(Long id) {
         Product product = productRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("존재하지 않는 상품입니다"));
 
-        User seller = product.getSeller();
-        Category category = product.getCategory();
-
-        return ProductInfoResponse.of(product, seller, category);
+        return ProductInfoResponse.from(product);
     }
 
     @Override
@@ -58,7 +65,7 @@ public class ProductServiceImpl implements ProductService {
 
         Product savedProduct = productRepository.saveAndRefresh(newProduct);
 
-        return ProductInfoResponse.of(savedProduct, user, category);
+        return ProductInfoResponse.from(savedProduct);
     }
 
     @Override
@@ -89,7 +96,7 @@ public class ProductServiceImpl implements ProductService {
 
         Product updatedProduct = productRepository.saveAndRefresh(product);
 
-        return ProductInfoResponse.of(updatedProduct, seller, newCategory);
+        return ProductInfoResponse.from(updatedProduct);
     }
 
     @Override

@@ -11,6 +11,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @Controller
 @RequiredArgsConstructor
 @RequestMapping("/products")
@@ -21,6 +23,14 @@ public class ProductController {
     @GetMapping("/{id}")
     public ResponseEntity<ProductInfoResponse> getProduct(@PathVariable Long id) {
         ProductInfoResponse response = productService.getProductInfo(id);
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping
+    public ResponseEntity<List<ProductInfoResponse>> getProducts(
+            @SessionAttribute(name = "userId") Long userId
+    ) {
+        List<ProductInfoResponse> response = productService.getProductsByUserId(userId);
         return ResponseEntity.ok(response);
     }
 
