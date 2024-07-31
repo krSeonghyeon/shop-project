@@ -32,11 +32,15 @@ public class SecurityConfig {
                                         "/auths/login",
                                         "/auths/logout"
                                 ).permitAll()
+                                .requestMatchers(
+                                        HttpMethod.GET,
+                                        "/products/{id}",
+                                        "/products/search"
+                                ).permitAll()
                                 .requestMatchers(HttpMethod.GET, "/users").hasAuthority("USER")
                                 .requestMatchers(HttpMethod.GET, "/users/seller").hasAuthority("SELLER")
                                 .requestMatchers(HttpMethod.POST, "/products").hasAuthority("SELLER")
                                 .requestMatchers(HttpMethod.GET, "/products").hasAuthority("SELLER")
-                                .requestMatchers(HttpMethod.GET, "/products/{id}").permitAll()
                                 .requestMatchers(HttpMethod.PUT, "/products/{id}").hasAuthority("SELLER")
                                 .requestMatchers(HttpMethod.DELETE, "/products/{id}").hasAuthority("SELLER")
                                 .anyRequest().authenticated()
