@@ -20,6 +20,14 @@ public class PaymentServiceImpl implements PaymentService {
     private final PaymentRepository paymentRepository;
 
     @Override
+    public PaymentInfoResponse getPaymentInfo(Long id) {
+        Payment payment = paymentRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("존재하지 않는 결제입니다."));
+
+        return PaymentInfoResponse.from(payment);
+    }
+
+    @Override
     @Transactional
     public PaymentInfoResponse createPayment(PaymentCreateRequest request) {
         Payment payment = Payment.builder()

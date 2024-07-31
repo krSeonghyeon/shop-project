@@ -6,6 +6,7 @@ import com.bcsd.shop.controller.dto.response.PaymentInfoResponse;
 
 public interface PaymentService {
 
+    PaymentInfoResponse getPaymentInfo(Long id);
     PaymentInfoResponse createPayment(PaymentCreateRequest request);
     PaymentInfoResponse cancelPayment(Long id);
     PaymentInfoResponse modifyStatusPayment(Long id, PaymentModifyStatusRequest request);

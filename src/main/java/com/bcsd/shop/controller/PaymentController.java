@@ -17,6 +17,12 @@ public class PaymentController {
 
     private final PaymentService paymentService;
 
+    @GetMapping("/{id}")
+    public ResponseEntity<PaymentInfoResponse> getPayment(@PathVariable Long id) {
+        PaymentInfoResponse response = paymentService.getPaymentInfo(id);
+        return ResponseEntity.ok(response);
+    }
+
     @PostMapping
     public ResponseEntity<PaymentInfoResponse> createPayment(
             @RequestBody @Valid PaymentCreateRequest request
