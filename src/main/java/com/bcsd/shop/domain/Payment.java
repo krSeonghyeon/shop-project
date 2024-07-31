@@ -26,7 +26,7 @@ public class Payment {
     private PaymentMethod method;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "status", nullable = false, insertable = false, columnDefinition = "ENUM('정상결제', '환불완료') DEFAULT '정상결제'")
+    @Column(name = "status", nullable = false, insertable = false, columnDefinition = "ENUM('정상결제', '취소신청', '환불완료') DEFAULT '정상결제'")
     private PaymentStatus status;
 
     @Column(name = "created_at", nullable = false, insertable = false, updatable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
@@ -34,4 +34,8 @@ public class Payment {
 
     @Column(name = "updated_at", nullable = false, insertable = false, updatable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")
     private LocalDateTime updatedAt;
+
+    public void changeStatus(PaymentStatus status) {
+        this.status = status;
+    }
 }
