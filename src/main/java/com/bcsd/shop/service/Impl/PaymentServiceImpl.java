@@ -1,6 +1,7 @@
 package com.bcsd.shop.service.Impl;
 
 import com.bcsd.shop.controller.dto.request.PaymentCreateRequest;
+import com.bcsd.shop.controller.dto.request.PaymentModifyStatusRequest;
 import com.bcsd.shop.controller.dto.response.PaymentInfoResponse;
 import com.bcsd.shop.domain.Payment;
 import com.bcsd.shop.domain.PaymentStatus;
@@ -46,6 +47,23 @@ public class PaymentServiceImpl implements PaymentService {
         // 실제 결제사와 결제 취소 로직이 있다고 가정
 
         payment.changeStatus(PaymentStatus.취소신청);
+
+        Payment updatedPayment = paymentRepository.saveAndRefresh(payment);
+
+        return PaymentInfoResponse.from(updatedPayment);
+    }
+
+    @Override
+    @Transactional
+    public PaymentInfoResponse modifyStatusPayment(Long id, PaymentModifyStatusRequest request) {
+        Payment payment = paymentRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("존재하지 않는 결제입니다."));
+
+        if (payment.getStatus() == request.status()) {
+            throw new IllegalStateException("동일한 결제상태로의 변경요청입니다");
+        }
+
+        payment.changeStatus(request.status());
 
         Payment updatedPayment = paymentRepository.saveAndRefresh(payment);
 

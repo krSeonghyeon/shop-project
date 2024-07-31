@@ -1,6 +1,7 @@
 package com.bcsd.shop.controller;
 
 import com.bcsd.shop.controller.dto.request.PaymentCreateRequest;
+import com.bcsd.shop.controller.dto.request.PaymentModifyStatusRequest;
 import com.bcsd.shop.controller.dto.response.PaymentInfoResponse;
 import com.bcsd.shop.service.PaymentService;
 import jakarta.validation.Valid;
@@ -27,6 +28,15 @@ public class PaymentController {
     @PutMapping("/{id}/cancel")
     public ResponseEntity<PaymentInfoResponse> cancelPayment(@PathVariable Long id) {
         PaymentInfoResponse response = paymentService.cancelPayment(id);
+        return ResponseEntity.ok(response);
+    }
+
+    @PutMapping("/{id}/status")
+    public ResponseEntity<PaymentInfoResponse> modifyStatusPayment(
+            @PathVariable Long id,
+            @RequestBody @Valid PaymentModifyStatusRequest request
+    ) {
+        PaymentInfoResponse response = paymentService.modifyStatusPayment(id, request);
         return ResponseEntity.ok(response);
     }
 }
