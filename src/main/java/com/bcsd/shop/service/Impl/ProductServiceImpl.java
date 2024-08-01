@@ -6,21 +6,26 @@ import com.bcsd.shop.controller.dto.request.ProductSearchRequest;
 import com.bcsd.shop.controller.dto.response.ProductInfoResponse;
 import com.bcsd.shop.controller.dto.response.ProductSimpleInfoResponse;
 import com.bcsd.shop.domain.*;
+import com.bcsd.shop.exception.CustomException;
 import com.bcsd.shop.repository.CategoryRepository;
 import com.bcsd.shop.repository.ProductRepository;
 import com.bcsd.shop.repository.UserRepository;
 import com.bcsd.shop.service.ProductService;
-import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+
+import static com.bcsd.shop.exception.errorcode.AuthErrorCode.AUTHORITY_NOT_FOUND;
+import static com.bcsd.shop.exception.errorcode.AuthErrorCode.UNAUTHORIZED_PRODUCT;
+import static com.bcsd.shop.exception.errorcode.ProductErrorCode.CATEGORY_NOT_FOUND;
+import static com.bcsd.shop.exception.errorcode.ProductErrorCode.PRODUCT_NOT_FOUND;
+import static com.bcsd.shop.exception.errorcode.UserErrorCode.USER_NOT_FOUND;
 
 @Service
 @RequiredArgsConstructor
@@ -98,7 +103,7 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public ProductInfoResponse getProductInfo(Long id) {
         Product product = productRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("존재하지 않는 상품입니다"));
+                .orElseThrow(() -> new CustomException(PRODUCT_NOT_FOUND));
 
         return ProductInfoResponse.from(product);
     }
@@ -107,10 +112,10 @@ public class ProductServiceImpl implements ProductService {
     @Transactional
     public ProductInfoResponse createProduct(Long userId, ProductCreateRequest request) {
         Category category = categoryRepository.findById(request.categoryId())
-                .orElseThrow(() -> new EntityNotFoundException("존재하지 않는 카테고리입니다"));
+                .orElseThrow(() -> new CustomException(CATEGORY_NOT_FOUND));
 
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new EntityNotFoundException("존재하지 않는 회원입니다"));
+                .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
 
         Product newProduct = Product.builder()
                 .category(category)
@@ -132,16 +137,16 @@ public class ProductServiceImpl implements ProductService {
     @Transactional
     public ProductInfoResponse modifyProduct(Long userId, Long id, ProductModifyRequest request) {
         Product product = productRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("존재하지 않는 상품입니다"));
+                .orElseThrow(() -> new CustomException(PRODUCT_NOT_FOUND));
 
         User seller = product.getSeller();
 
         if (!seller.getId().equals(userId)) {
-            throw new AccessDeniedException("해당 상품의 판매자가 아닙니다");
+            throw new CustomException(UNAUTHORIZED_PRODUCT);
         }
 
         Category newCategory = categoryRepository.findById(request.categoryId())
-                .orElseThrow(() -> new EntityNotFoundException("존재하지 않는 카테고리입니다"));
+                .orElseThrow(() -> new CustomException(CATEGORY_NOT_FOUND));
 
         product.changeProductInfo(
                 newCategory,
@@ -163,12 +168,12 @@ public class ProductServiceImpl implements ProductService {
     @Transactional
     public void deleteProduct(Long userId, Long id) {
         Product product = productRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("존재하지 않는 상품입니다"));
+                .orElseThrow(() -> new CustomException(PRODUCT_NOT_FOUND));
 
         User seller = product.getSeller();
 
         if (!seller.getId().equals(userId)) {
-            throw new AccessDeniedException("해당 상품의 판매자가 아닙니다");
+            throw new CustomException(AUTHORITY_NOT_FOUND);
         }
 
         productRepository.deleteById(id);

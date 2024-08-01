@@ -5,12 +5,14 @@ import com.bcsd.shop.controller.dto.request.PaymentModifyStatusRequest;
 import com.bcsd.shop.controller.dto.response.PaymentInfoResponse;
 import com.bcsd.shop.domain.Payment;
 import com.bcsd.shop.domain.PaymentStatus;
+import com.bcsd.shop.exception.CustomException;
 import com.bcsd.shop.repository.PaymentRepository;
 import com.bcsd.shop.service.PaymentService;
-import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import static com.bcsd.shop.exception.errorcode.PaymentErrorCode.*;
 
 @Service
 @Transactional(readOnly = true)
@@ -22,7 +24,7 @@ public class PaymentServiceImpl implements PaymentService {
     @Override
     public PaymentInfoResponse getPaymentInfo(Long id) {
         Payment payment = paymentRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("존재하지 않는 결제입니다."));
+                .orElseThrow(() -> new CustomException(PAYMENT_NOT_FOUND));
 
         return PaymentInfoResponse.from(payment);
     }
@@ -46,10 +48,10 @@ public class PaymentServiceImpl implements PaymentService {
     @Transactional
     public PaymentInfoResponse cancelPayment(Long id) {
         Payment payment = paymentRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("존재하지 않는 결제입니다."));
+                .orElseThrow(() -> new CustomException(PAYMENT_NOT_FOUND));
 
         if (payment.getStatus() != PaymentStatus.정상결제) {
-            throw new IllegalStateException("이미 취소되거나 취소신청 중인 결제입니다");
+            throw new CustomException(INVALID_ALREADY_CANCELED);
         }
 
         // 실제 결제사와 결제 취소 로직이 있다고 가정
@@ -65,10 +67,10 @@ public class PaymentServiceImpl implements PaymentService {
     @Transactional
     public PaymentInfoResponse modifyStatusPayment(Long id, PaymentModifyStatusRequest request) {
         Payment payment = paymentRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("존재하지 않는 결제입니다."));
+                .orElseThrow(() -> new CustomException(PAYMENT_NOT_FOUND));
 
         if (payment.getStatus() == request.status()) {
-            throw new IllegalStateException("동일한 결제상태로의 변경요청입니다");
+            throw new CustomException(INVALID_SAME_STATUS);
         }
 
         payment.changeStatus(request.status());

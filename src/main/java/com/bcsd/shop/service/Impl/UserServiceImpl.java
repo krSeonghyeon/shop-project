@@ -10,19 +10,19 @@ import com.bcsd.shop.domain.Authority;
 import com.bcsd.shop.domain.Seller;
 import com.bcsd.shop.domain.User;
 import com.bcsd.shop.domain.UserAuthority;
+import com.bcsd.shop.exception.CustomException;
 import com.bcsd.shop.repository.AuthorityRepository;
 import com.bcsd.shop.repository.SellerRepository;
 import com.bcsd.shop.repository.UserAuthorityRepository;
 import com.bcsd.shop.repository.UserRepository;
 import com.bcsd.shop.service.UserService;
-import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.NoSuchElementException;
+import static com.bcsd.shop.exception.errorcode.AuthErrorCode.AUTHORITY_NOT_FOUND;
+import static com.bcsd.shop.exception.errorcode.UserErrorCode.*;
 
 @Service
 @Transactional(readOnly = true)
@@ -38,7 +38,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserInfoResponse getUserInfo(Long userId) {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new EntityNotFoundException("존재하지 않는 회원입니다."));
+                .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
 
         return UserInfoResponse.from(user);
     }
@@ -46,10 +46,10 @@ public class UserServiceImpl implements UserService {
     @Override
     public SellerInfoResponse getSellerInfo(Long userId) {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new EntityNotFoundException("존재하지 않는 회원입니다."));
+                .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
 
         Seller seller = sellerRepository.findByUserId(userId)
-                .orElseThrow(() -> new EntityNotFoundException("존재하지 않는 판매자입니다."));
+                .orElseThrow(() -> new CustomException(SELLER_NOT_FOUND));
 
         return SellerInfoResponse.of(user, seller);
     }
@@ -58,7 +58,7 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public UserInfoResponse join(UserJoinRequest request) {
         if (userRepository.existsByEmail(request.email())) {
-            throw new DataIntegrityViolationException("이미 사용 중인 이메일 입니다.");
+            throw new CustomException(EMAIL_DUPLICATED);
         }
 
         String encodedPassword = passwordEncoder.encode(request.password());
@@ -82,11 +82,11 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public SellerInfoResponse joinSeller(SellerJoinRequest request) {
         if (userRepository.existsByEmail(request.email())) {
-            throw new DataIntegrityViolationException("이미 사용 중인 이메일 입니다.");
+            throw new CustomException(EMAIL_DUPLICATED);
         }
 
         if (sellerRepository.existsByBusinessNumber(request.businessNumber())) {
-            throw new DataIntegrityViolationException("이미 사용 중인 사업자 등록 번호 입니다.");
+            throw new CustomException(BUSINESS_NUM_DUPLICATED);
         }
 
         String encodedPassword = passwordEncoder.encode(request.password());
@@ -118,10 +118,10 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public void modifyPassword(Long userId, PasswordModifyRequest request) {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new EntityNotFoundException("존재하지 않는 회원입니다."));
+                .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
 
         if (!passwordEncoder.matches(request.oldPassword(), user.getPassword())) {
-            throw new IllegalArgumentException("현재 비밀번호가 틀렸습니다.");
+            throw new CustomException(INVALID_PASSWORD);
         }
 
         String newPassword = passwordEncoder.encode(request.newPassword());
@@ -132,7 +132,7 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public UserInfoResponse modifyUserInfo(Long userId, UserInfoModifyRequest request) {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new EntityNotFoundException("존재하지 않는 회원입니다."));
+                .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
 
         user.changeUserInfo(request.phoneNumber(), request.address());
         return UserInfoResponse.from(user);
@@ -142,7 +142,7 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public void deleteUser(Long userId) {
         if (!userRepository.existsById(userId)) {
-            throw new EntityNotFoundException("존재하지 않는 회원입니다.");
+            throw new CustomException(USER_NOT_FOUND);
         }
 
         userRepository.deleteById(userId);
@@ -150,7 +150,7 @@ public class UserServiceImpl implements UserService {
 
     private void assignAuthorityToUser(User user, String authorityType) {
         Authority authority = authorityRepository.findByType(authorityType)
-                .orElseThrow(() -> new NoSuchElementException(authorityType + " 권한이 존재하지 않습니다"));
+                .orElseThrow(() -> new CustomException(AUTHORITY_NOT_FOUND));
 
         UserAuthority userAuthority = UserAuthority.builder()
                 .user(user)
