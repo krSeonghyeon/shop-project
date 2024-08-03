@@ -21,8 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
-import static com.bcsd.shop.exception.errorcode.AuthErrorCode.AUTHORITY_NOT_FOUND;
-import static com.bcsd.shop.exception.errorcode.AuthErrorCode.UNAUTHORIZED_PRODUCT;
+import static com.bcsd.shop.exception.errorcode.AuthErrorCode.FORBIDDEN_PRODUCT;
 import static com.bcsd.shop.exception.errorcode.ProductErrorCode.CATEGORY_NOT_FOUND;
 import static com.bcsd.shop.exception.errorcode.ProductErrorCode.PRODUCT_NOT_FOUND;
 import static com.bcsd.shop.exception.errorcode.UserErrorCode.USER_NOT_FOUND;
@@ -142,7 +141,7 @@ public class ProductServiceImpl implements ProductService {
         User seller = product.getSeller();
 
         if (!seller.getId().equals(userId)) {
-            throw new CustomException(UNAUTHORIZED_PRODUCT);
+            throw new CustomException(FORBIDDEN_PRODUCT);
         }
 
         Category newCategory = categoryRepository.findById(request.categoryId())
@@ -173,7 +172,7 @@ public class ProductServiceImpl implements ProductService {
         User seller = product.getSeller();
 
         if (!seller.getId().equals(userId)) {
-            throw new CustomException(AUTHORITY_NOT_FOUND);
+            throw new CustomException(FORBIDDEN_PRODUCT);
         }
 
         productRepository.deleteById(id);
