@@ -70,7 +70,7 @@ public class PaymentServiceImpl implements PaymentService {
                 .orElseThrow(() -> new CustomException(PAYMENT_NOT_FOUND));
 
         if (payment.getStatus() == request.status()) {
-            throw new CustomException(INVALID_SAME_STATUS);
+            throw new CustomException(INVALID_SAME_PAYMENT_STATUS);
         }
 
         payment.changeStatus(request.status());

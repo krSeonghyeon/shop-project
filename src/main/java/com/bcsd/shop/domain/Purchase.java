@@ -58,4 +58,8 @@ public class Purchase {
 
     @Column(name = "updated_at", nullable = false, insertable = false, updatable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")
     private LocalDateTime updatedAt;
+
+    public void changeStatus(PurchaseStatus status) {
+        this.status = status;
+    }
 }

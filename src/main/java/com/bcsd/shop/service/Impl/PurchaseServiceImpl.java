@@ -1,6 +1,7 @@
 package com.bcsd.shop.service.Impl;
 
 import com.bcsd.shop.controller.dto.request.PurchaseCreateRequest;
+import com.bcsd.shop.controller.dto.request.PurchaseModifyStatusRequest;
 import com.bcsd.shop.controller.dto.response.PurchaseInfoResponse;
 import com.bcsd.shop.domain.*;
 import com.bcsd.shop.exception.CustomException;
@@ -13,9 +14,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import static com.bcsd.shop.exception.errorcode.AuthErrorCode.FORBIDDEN_PRODUCT;
 import static com.bcsd.shop.exception.errorcode.PaymentErrorCode.PAYMENT_NOT_FOUND;
 import static com.bcsd.shop.exception.errorcode.ProductErrorCode.PRODUCT_NOT_FOUND;
-import static com.bcsd.shop.exception.errorcode.PurchaseErrorCode.INVALID_OVER_STOCK;
+import static com.bcsd.shop.exception.errorcode.PurchaseErrorCode.*;
 import static com.bcsd.shop.exception.errorcode.UserErrorCode.USER_NOT_FOUND;
 
 @Service
@@ -67,5 +69,28 @@ public class PurchaseServiceImpl implements PurchaseService {
         Purchase savedPurchase = purchaseRepository.saveAndRefresh(purchase);
 
         return PurchaseInfoResponse.from(savedPurchase);
+    }
+
+    @Override
+    @Transactional
+    public PurchaseInfoResponse modifyStatusPurchase(Long userId, Long id, PurchaseModifyStatusRequest request) {
+        Purchase purchase = purchaseRepository.findById(id)
+                .orElseThrow(() -> new CustomException(PURCHASE_NOT_FOUND));
+
+        User seller = purchase.getSeller();
+
+        if (!seller.getId().equals(userId)) {
+            throw new CustomException(FORBIDDEN_PRODUCT);
+        }
+
+        if (purchase.getStatus() == request.status()) {
+            throw new CustomException(INVALID_SAME_PURCHASE_STATUS);
+        }
+
+        purchase.changeStatus(request.status());
+
+        Purchase updatedPurchase = purchaseRepository.saveAndRefresh(purchase);
+
+        return PurchaseInfoResponse.from(updatedPurchase);
     }
 }
