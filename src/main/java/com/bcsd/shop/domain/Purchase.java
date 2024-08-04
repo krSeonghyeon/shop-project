@@ -40,6 +40,9 @@ public class Purchase {
     @Column(name = "quantity", nullable = false, columnDefinition = "INT UNSIGNED")
     private Integer quantity;
 
+    @Column(name = "shipping_cost", nullable = false, columnDefinition = "INT UNSIGNED")
+    private Integer shippingCost;
+
     @Column(name = "shipping_address", nullable = false)
     private String shippingAddress;
 

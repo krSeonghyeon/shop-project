@@ -74,4 +74,12 @@ public class Product {
         this.stock = newStock;
         this.status = newStatus;
     }
+
+    public void decreaseStock(int count) {
+        this.stock -= count;
+    }
+
+    public void changeStatus(ProductStatus status) {
+        this.status = status;
+    }
 }
