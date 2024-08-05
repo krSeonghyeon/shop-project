@@ -137,4 +137,23 @@ public class PurchaseServiceImpl implements PurchaseService {
 
         return PurchaseInfoResponse.from(updatedPurchase);
     }
+
+    @Override
+    @Transactional
+    public PurchaseInfoResponse cancelPurchase(Long userId, Long id) {
+        Purchase purchase = purchaseRepository.findById(id)
+                .orElseThrow(() -> new CustomException(PURCHASE_NOT_FOUND));
+
+        User user = purchase.getUser();
+
+        if (!user.getId().equals(userId)) {
+            throw new CustomException(FORBIDDEN_PURCHASE);
+        }
+
+        purchase.changeStatus(PurchaseStatus.취소요청);
+
+        Purchase updatedPurchase = purchaseRepository.saveAndRefresh(purchase);
+
+        return PurchaseInfoResponse.from(updatedPurchase);
+    }
 }
