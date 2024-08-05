@@ -14,6 +14,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 import static com.bcsd.shop.exception.errorcode.AuthErrorCode.FORBIDDEN_PRODUCT;
 import static com.bcsd.shop.exception.errorcode.AuthErrorCode.FORBIDDEN_PURCHASE;
 import static com.bcsd.shop.exception.errorcode.PaymentErrorCode.PAYMENT_NOT_FOUND;
@@ -30,6 +32,24 @@ public class PurchaseServiceImpl implements PurchaseService {
     private final ProductRepository productRepository;
     private final UserRepository userRepository;
     private final PaymentRepository paymentRepository;
+
+    @Override
+    public List<PurchaseInfoResponse> getPurchasesByProductId(Long productId, Long userId) {
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new CustomException(PRODUCT_NOT_FOUND));
+
+        User seller = product.getSeller();
+
+        if (!seller.getId().equals(userId)) {
+            throw new CustomException(FORBIDDEN_PRODUCT);
+        }
+
+        List<Purchase> purchases = purchaseRepository.findAllByProductId(productId);
+
+        return purchases.stream()
+                .map(PurchaseInfoResponse::from)
+                .toList();
+    }
 
     @Override
     public PurchaseInfoResponse getPurchaseInfo(Long id, Long userId) {

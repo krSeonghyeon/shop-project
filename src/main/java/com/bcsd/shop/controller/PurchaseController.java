@@ -10,6 +10,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/purchases")
 @RequiredArgsConstructor
@@ -24,6 +26,15 @@ public class PurchaseController {
     ) {
         PurchaseInfoResponse response = purchaseService.getPurchaseInfo(id, userId);
         return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/product/{productId}")
+    public ResponseEntity<List<PurchaseInfoResponse>> getPurchasesByProduct(
+            @PathVariable Long productId,
+            @SessionAttribute(name = "userId") Long userId
+    ) {
+        List<PurchaseInfoResponse> responses = purchaseService.getPurchasesByProductId(productId, userId);
+        return ResponseEntity.ok(responses);
     }
 
     @PostMapping
