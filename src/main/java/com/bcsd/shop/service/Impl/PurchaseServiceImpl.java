@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import static com.bcsd.shop.exception.errorcode.AuthErrorCode.FORBIDDEN_PRODUCT;
+import static com.bcsd.shop.exception.errorcode.AuthErrorCode.FORBIDDEN_PURCHASE;
 import static com.bcsd.shop.exception.errorcode.PaymentErrorCode.PAYMENT_NOT_FOUND;
 import static com.bcsd.shop.exception.errorcode.ProductErrorCode.PRODUCT_NOT_FOUND;
 import static com.bcsd.shop.exception.errorcode.PurchaseErrorCode.*;
@@ -29,6 +30,21 @@ public class PurchaseServiceImpl implements PurchaseService {
     private final ProductRepository productRepository;
     private final UserRepository userRepository;
     private final PaymentRepository paymentRepository;
+
+    @Override
+    public PurchaseInfoResponse getPurchaseInfo(Long id, Long userId) {
+        Purchase purchase = purchaseRepository.findById(id)
+                .orElseThrow(() -> new CustomException(PURCHASE_NOT_FOUND));
+
+        User seller = purchase.getSeller();
+        User user = purchase.getUser();
+
+        if (!userId.equals(user.getId()) && !userId.equals(seller.getId())) {
+            throw new CustomException(FORBIDDEN_PURCHASE);
+        }
+
+        return PurchaseInfoResponse.from(purchase);
+    }
 
     @Override
     @Transactional
