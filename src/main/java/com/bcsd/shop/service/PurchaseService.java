@@ -8,6 +8,7 @@ import java.util.List;
 
 public interface PurchaseService {
 
+    List<PurchaseInfoResponse> getPurchasesByUserId(Long userId);
     List<PurchaseInfoResponse> getPurchasesByProductId(Long productId, Long userId);
     PurchaseInfoResponse getPurchaseInfo(Long id, Long userId);
     PurchaseInfoResponse createPurchase(Long userId, PurchaseCreateRequest request);

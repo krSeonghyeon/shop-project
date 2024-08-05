@@ -37,6 +37,14 @@ public class PurchaseController {
         return ResponseEntity.ok(responses);
     }
 
+    @GetMapping("/user")
+    public ResponseEntity<List<PurchaseInfoResponse>> getPurchaseByUser(
+            @SessionAttribute(name = "userId") Long userId
+    ) {
+        List<PurchaseInfoResponse> responses = purchaseService.getPurchasesByUserId(userId);
+        return ResponseEntity.ok(responses);
+    }
+
     @PostMapping
     public ResponseEntity<PurchaseInfoResponse> createPurchase(
             @SessionAttribute(name = "userId") Long userId,

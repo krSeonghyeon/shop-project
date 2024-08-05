@@ -34,6 +34,14 @@ public class PurchaseServiceImpl implements PurchaseService {
     private final PaymentRepository paymentRepository;
 
     @Override
+    public List<PurchaseInfoResponse> getPurchasesByUserId(Long userId) {
+        List<Purchase> purchases = purchaseRepository.findAllByUserId(userId);
+        return purchases.stream()
+                .map(PurchaseInfoResponse::from)
+                .toList();
+    }
+
+    @Override
     public List<PurchaseInfoResponse> getPurchasesByProductId(Long productId, Long userId) {
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new CustomException(PRODUCT_NOT_FOUND));

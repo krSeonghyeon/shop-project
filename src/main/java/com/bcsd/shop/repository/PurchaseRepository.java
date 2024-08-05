@@ -8,4 +8,5 @@ import java.util.List;
 public interface PurchaseRepository extends JpaRepository<Purchase, Long>, PurchaseRepositoryCustom {
 
     List<Purchase> findAllByProductId(Long productId);
+    List<Purchase> findAllByUserId(Long userId);
 }
