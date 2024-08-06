@@ -35,8 +35,7 @@ public class SecurityConfig {
                                         HttpMethod.POST,
                                         "/users",
                                         "/users/seller",
-                                        "/auths/login",
-                                        "/auths/logout"
+                                        "/auths/login"
                                 ).permitAll()
                                 .requestMatchers(
                                         HttpMethod.GET,
@@ -49,6 +48,12 @@ public class SecurityConfig {
                                 .requestMatchers(HttpMethod.GET, "/products").hasAuthority("SELLER")
                                 .requestMatchers(HttpMethod.PUT, "/products/{id}").hasAuthority("SELLER")
                                 .requestMatchers(HttpMethod.DELETE, "/products/{id}").hasAuthority("SELLER")
+                                .requestMatchers(HttpMethod.POST, "/purchases").hasAuthority("USER")
+                                .requestMatchers(HttpMethod.PUT, "/purchases/{id}/status").hasAuthority("SELLER")
+                                .requestMatchers(HttpMethod.GET, "/purchases/product/{productId}").hasAuthority("SELLER")
+                                .requestMatchers(HttpMethod.GET, "/purchases/user").hasAuthority("USER")
+                                .requestMatchers(HttpMethod.PUT, "/purchases/{id}/cancel").hasAuthority("USER")
+                                .requestMatchers(HttpMethod.PUT, "/purchases/{id}/determine").hasAuthority("USER")
                                 .anyRequest().authenticated()
                 )
                 .exceptionHandling(exceptionalHandling -> exceptionalHandling
