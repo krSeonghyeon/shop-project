@@ -150,6 +150,10 @@ public class PurchaseServiceImpl implements PurchaseService {
             throw new CustomException(FORBIDDEN_PURCHASE);
         }
 
+        if (purchase.getStatus() != PurchaseStatus.결제완료) {
+            throw new CustomException(INVALID_PURCHASE_CANCEL);
+        }
+
         purchase.changeStatus(PurchaseStatus.취소요청);
 
         Purchase updatedPurchase = purchaseRepository.saveAndRefresh(purchase);
