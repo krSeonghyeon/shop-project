@@ -19,7 +19,6 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/users")
-@Slf4j
 public class UserController {
 
     private final UserService userService;
@@ -28,9 +27,6 @@ public class UserController {
     public ResponseEntity<UserInfoResponse> getUserInfo(
             @SessionAttribute(name = "userId", required = false) Long userId
     ) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        log.info("{}", authentication);
-
         return ResponseEntity.ok(userService.getUserInfo(userId));
     }
 

@@ -26,7 +26,6 @@ import static com.bcsd.shop.exception.errorcode.AuthErrorCode.AUTHENTICATION_FAI
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
-@Slf4j
 public class AuthServiceImpl implements AuthService {
 
     private final AuthenticationManagerBuilder authenticationManager;
