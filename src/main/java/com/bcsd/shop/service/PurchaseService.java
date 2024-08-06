@@ -14,4 +14,5 @@ public interface PurchaseService {
     PurchaseInfoResponse createPurchase(Long userId, PurchaseCreateRequest request);
     PurchaseInfoResponse modifyStatusPurchase(Long userId, Long id, PurchaseModifyStatusRequest request);
     PurchaseInfoResponse cancelPurchase(Long userId, Long id);
+    PurchaseInfoResponse modifyStatusPurchaseUser(Long userId, Long id, PurchaseModifyStatusRequest request);
 }

@@ -160,4 +160,35 @@ public class PurchaseServiceImpl implements PurchaseService {
 
         return PurchaseInfoResponse.from(updatedPurchase);
     }
+
+    @Override
+    @Transactional
+    public PurchaseInfoResponse modifyStatusPurchaseUser(Long userId, Long id, PurchaseModifyStatusRequest request) {
+        Purchase purchase = purchaseRepository.findById(id)
+                .orElseThrow(() -> new CustomException(PURCHASE_NOT_FOUND));
+
+        User user = purchase.getUser();
+
+        if (!user.getId().equals(userId)) {
+            throw new CustomException(FORBIDDEN_PURCHASE);
+        }
+
+        if (purchase.getStatus() != PurchaseStatus.배송중) {
+            throw new CustomException(INVALID_PURCHASE_DETERMINE);
+        }
+
+        PurchaseStatus status = request.status();
+
+        if (status != PurchaseStatus.반품요청
+                && status != PurchaseStatus.교환요청
+                && status != PurchaseStatus.구매확정) {
+            throw new CustomException(INVALID_PURCHASE_STATUS);
+        }
+
+        purchase.changeStatus(status);
+
+        Purchase updatedPurchase = purchaseRepository.saveAndRefresh(purchase);
+
+        return PurchaseInfoResponse.from(updatedPurchase);
+    }
 }

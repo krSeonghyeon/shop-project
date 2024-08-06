@@ -72,4 +72,14 @@ public class PurchaseController {
         PurchaseInfoResponse response = purchaseService.cancelPurchase(userId, id);
         return ResponseEntity.ok(response);
     }
+
+    @PutMapping("/{id}/determine")
+    public ResponseEntity<PurchaseInfoResponse> determinePurchase(
+            @SessionAttribute(name = "userId") Long userId,
+            @PathVariable Long id,
+            @RequestBody @Valid PurchaseModifyStatusRequest request
+    ) {
+        PurchaseInfoResponse response = purchaseService.modifyStatusPurchaseUser(userId, id, request);
+        return ResponseEntity.ok(response);
+    }
 }
