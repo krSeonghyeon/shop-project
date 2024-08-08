@@ -266,4 +266,4 @@
 </details>
 
 ## 📕 API문서
-[API문서](,/docs/shopapi-docs.html)
+[API문서](https://krSeonghyeon.github.io/shop-project/shopapi-docs.html)
