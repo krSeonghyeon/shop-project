@@ -1,4 +1,4 @@
-package com.bcsd.shop.security;
+package com.bcsd.shop.config;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
