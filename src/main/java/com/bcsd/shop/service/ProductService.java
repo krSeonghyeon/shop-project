@@ -4,6 +4,7 @@ import com.bcsd.shop.controller.dto.request.ProductCreateRequest;
 import com.bcsd.shop.controller.dto.request.ProductModifyRequest;
 import com.bcsd.shop.controller.dto.request.ProductSearchRequest;
 import com.bcsd.shop.controller.dto.response.ProductInfoResponse;
+import com.bcsd.shop.controller.dto.response.ProductSearchResponse;
 import com.bcsd.shop.controller.dto.response.ProductSimpleInfoResponse;
 import com.bcsd.shop.domain.*;
 import com.bcsd.shop.exception.CustomException;
@@ -11,6 +12,7 @@ import com.bcsd.shop.repository.CategoryRepository;
 import com.bcsd.shop.repository.ProductRepository;
 import com.bcsd.shop.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -34,7 +36,7 @@ public class ProductService {
     private final CategoryRepository categoryRepository;
     private final UserRepository userRepository;
 
-    public List<ProductSimpleInfoResponse> searchProducts(ProductSearchRequest request) {
+    public ProductSearchResponse searchProducts(ProductSearchRequest request) {
         Pageable pageable = PageRequest.of(
                 request.page(), request.listSize(),
                 getSort(request.getSorter())
@@ -45,11 +47,18 @@ public class ProductService {
                 .and(priceBetween(request.minPrice(), request.maxPrice()))
                 .and(statusEquals(request.status()));
 
-        List<Product> products = productRepository.findAll(specification, pageable).getContent();
-
-        return products.stream()
+        Page<Product> productPage = productRepository.findAll(specification, pageable);
+        List<ProductSimpleInfoResponse> responses = productPage.getContent().stream()
                 .map(ProductSimpleInfoResponse::from)
                 .toList();
+
+        return new ProductSearchResponse(
+                responses,
+                productPage.getNumber(),
+                productPage.getTotalPages(),
+                productPage.getTotalElements(),
+                productPage.getSize()
+        );
     }
 
     private Sort getSort(Sorter sorter) {

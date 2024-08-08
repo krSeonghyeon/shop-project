@@ -4,6 +4,7 @@ import com.bcsd.shop.controller.dto.request.ProductCreateRequest;
 import com.bcsd.shop.controller.dto.request.ProductModifyRequest;
 import com.bcsd.shop.controller.dto.request.ProductSearchRequest;
 import com.bcsd.shop.controller.dto.response.ProductInfoResponse;
+import com.bcsd.shop.controller.dto.response.ProductSearchResponse;
 import com.bcsd.shop.controller.dto.response.ProductSimpleInfoResponse;
 import com.bcsd.shop.service.ProductService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -39,10 +40,10 @@ public class ProductController {
             }
     )
     @GetMapping("/search")
-    public ResponseEntity<List<ProductSimpleInfoResponse>> searchProducts(
+    public ResponseEntity<ProductSearchResponse> searchProducts(
             @ModelAttribute @Valid ProductSearchRequest request
     ) {
-        List<ProductSimpleInfoResponse> response = productService.searchProducts(request);
+        ProductSearchResponse response = productService.searchProducts(request);
         return ResponseEntity.ok(response);
     }
 
