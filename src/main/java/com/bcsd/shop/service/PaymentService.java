@@ -29,7 +29,13 @@ public class PaymentService {
 
     @Transactional
     public PaymentInfoResponse createPayment(PaymentCreateRequest request) {
+
+        if (paymentRepository.existsByTransactionId(request.transactionId())) {
+            throw new CustomException(PAYMENT_DUPLICATED);
+        }
+
         Payment payment = Payment.builder()
+                .transactionId(request.transactionId())
                 .amount(request.amount())
                 .method(request.method())
                 .build();

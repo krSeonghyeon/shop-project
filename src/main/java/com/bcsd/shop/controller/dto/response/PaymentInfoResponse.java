@@ -9,6 +9,7 @@ import java.time.LocalDateTime;
 
 public record PaymentInfoResponse(
     Long id,
+    String transactionId,
     Long amount,
     PaymentMethod method,
     PaymentStatus status,
@@ -22,6 +23,7 @@ public record PaymentInfoResponse(
     public static PaymentInfoResponse from(Payment payment) {
         return new PaymentInfoResponse(
                 payment.getId(),
+                payment.getTransactionId(),
                 payment.getAmount(),
                 payment.getMethod(),
                 payment.getStatus(),

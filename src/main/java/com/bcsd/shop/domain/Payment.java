@@ -6,7 +6,9 @@ import lombok.*;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "payment")
+@Table(name = "payment", uniqueConstraints = {
+        @UniqueConstraint(columnNames = "transaction_id", name = "UK_PAYMENT_TRANSACTION")
+})
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Getter
@@ -17,6 +19,9 @@ public class Payment {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private Long id;
+
+    @Column(name = "transaction_id", nullable = false, length = 50)
+    private String transactionId;
 
     @Column(name = "amount", nullable = false, columnDefinition = "BIGINT UNSIGNED")
     private Long amount;
