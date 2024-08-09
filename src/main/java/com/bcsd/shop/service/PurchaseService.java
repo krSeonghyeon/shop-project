@@ -10,6 +10,7 @@ import com.bcsd.shop.repository.ProductRepository;
 import com.bcsd.shop.repository.PurchaseRepository;
 import com.bcsd.shop.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,12 +27,14 @@ import static com.bcsd.shop.exception.errorcode.UserErrorCode.USER_NOT_FOUND;
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
+@Slf4j
 public class PurchaseService {
 
     private final PurchaseRepository purchaseRepository;
     private final ProductRepository productRepository;
     private final UserRepository userRepository;
     private final PaymentRepository paymentRepository;
+    private final PaymentService paymentService;
 
     public List<PurchaseInfoResponse> getPurchasesByUserId(Long userId) {
         List<Purchase> purchases = purchaseRepository.findAllByUserId(userId);
@@ -73,50 +76,67 @@ public class PurchaseService {
 
     @Transactional
     public PurchaseInfoResponse createPurchase(Long userId, PurchaseCreateRequest request) {
-        if (purchaseRepository.existsByPaymentId(request.paymentId())) {
-            throw new CustomException(PURCHASE_DUPLICATED);
+        try {
+            if (purchaseRepository.existsByPaymentId(request.paymentId())) {
+                throw new CustomException(PURCHASE_DUPLICATED);
+            }
+
+            Product product = productRepository.findByIdForUpdate(request.productId())
+                    .orElseThrow(() -> new CustomException(PRODUCT_NOT_FOUND));
+
+            User user = userRepository.findById(userId)
+                    .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
+
+            User seller = product.getSeller();
+
+            Payment payment = paymentRepository.findById(request.paymentId())
+                    .orElseThrow(() -> new CustomException(PAYMENT_NOT_FOUND));
+
+            if (product.getStatus() != ProductStatus.판매중) {
+                throw new CustomException(INVALID_PRODUCT_STATUS);
+            }
+
+            if (request.quantity() > product.getStock()) {
+                throw new CustomException(INVALID_OVER_STOCK);
+            }
+
+            product.decreaseStock(request.quantity());
+
+            if (product.getStock() == 0) {
+                product.changeStatus(ProductStatus.품절);
+            }
+
+            Purchase purchase = Purchase.builder()
+                    .product(product)
+                    .user(user)
+                    .seller(seller)
+                    .payment(payment)
+                    .price(product.getPrice())
+                    .quantity(request.quantity())
+                    .shippingCost(product.getShippingCost())
+                    .shippingAddress(user.getAddress())
+                    .request(request.request())
+                    .build();
+
+            Purchase savedPurchase = purchaseRepository.saveAndRefresh(purchase);
+
+            return PurchaseInfoResponse.from(savedPurchase);
+        } catch (CustomException e) {
+            handlePaymentCancel(request.paymentId());
+            throw e;
+        } catch (Exception e) {
+            log.error("주문에서 예상치 못한 예외가 발생했습니다. 요청 정보: {}, 에러 메시지: {}", request, e.getMessage());
+            handlePaymentCancel(request.paymentId());
+            throw new CustomException(FAILED_PURCHASE);
         }
+    }
 
-        Product product = productRepository.findByIdForUpdate(request.productId())
-                .orElseThrow(() -> new CustomException(PRODUCT_NOT_FOUND));
-
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
-
-        User seller = product.getSeller();
-
-        Payment payment = paymentRepository.findById(request.paymentId())
-                .orElseThrow(() -> new CustomException(PAYMENT_NOT_FOUND));
-
-        if (product.getStatus() != ProductStatus.판매중) {
-            throw new CustomException(INVALID_PRODUCT_STATUS);
+    private void handlePaymentCancel(Long paymentId) {
+        try {
+            paymentService.cancelPayment(paymentId);
+        } catch (Exception ex) {
+            log.error("결제 취소에 실패했습니다. 결제ID: {}", paymentId);
         }
-
-        if (request.quantity() > product.getStock()) {
-            throw new CustomException(INVALID_OVER_STOCK);
-        }
-
-        product.decreaseStock(request.quantity());
-
-        if (product.getStock() == 0) {
-            product.changeStatus(ProductStatus.품절);
-        }
-
-        Purchase purchase = Purchase.builder()
-                .product(product)
-                .user(user)
-                .seller(seller)
-                .payment(payment)
-                .price(product.getPrice())
-                .quantity(request.quantity())
-                .shippingCost(product.getShippingCost())
-                .shippingAddress(user.getAddress())
-                .request(request.request())
-                .build();
-
-        Purchase savedPurchase = purchaseRepository.saveAndRefresh(purchase);
-
-        return PurchaseInfoResponse.from(savedPurchase);
     }
 
     @Transactional
