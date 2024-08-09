@@ -23,8 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 import static com.bcsd.shop.exception.errorcode.AuthErrorCode.FORBIDDEN_PRODUCT;
-import static com.bcsd.shop.exception.errorcode.ProductErrorCode.CATEGORY_NOT_FOUND;
-import static com.bcsd.shop.exception.errorcode.ProductErrorCode.PRODUCT_NOT_FOUND;
+import static com.bcsd.shop.exception.errorcode.ProductErrorCode.*;
 import static com.bcsd.shop.exception.errorcode.UserErrorCode.USER_NOT_FOUND;
 
 @Service
@@ -114,6 +113,10 @@ public class ProductService {
 
     @Transactional
     public ProductInfoResponse createProduct(Long userId, ProductCreateRequest request) {
+        if (productRepository.existsBySellerIdAndName(userId, request.name())) {
+            throw new CustomException(PRODUCT_DUPLICATED);
+        }
+
         Category category = categoryRepository.findById(request.categoryId())
                 .orElseThrow(() -> new CustomException(CATEGORY_NOT_FOUND));
 

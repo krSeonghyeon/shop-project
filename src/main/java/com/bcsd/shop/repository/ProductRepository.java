@@ -9,4 +9,5 @@ import java.util.List;
 public interface ProductRepository extends JpaRepository<Product, Long>, ProductRepositoryCustom, JpaSpecificationExecutor<Product> {
 
     List<Product> findAllBySellerId(Long sellerId);
+    boolean existsBySellerIdAndName(Long sellerId, String name);
 }
