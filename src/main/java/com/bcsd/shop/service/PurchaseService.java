@@ -77,7 +77,7 @@ public class PurchaseService {
             throw new CustomException(PURCHASE_DUPLICATED);
         }
 
-        Product product = productRepository.findById(request.productId())
+        Product product = productRepository.findByIdForUpdate(request.productId())
                 .orElseThrow(() -> new CustomException(PRODUCT_NOT_FOUND));
 
         User user = userRepository.findById(userId)
