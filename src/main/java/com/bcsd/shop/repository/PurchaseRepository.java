@@ -9,4 +9,5 @@ public interface PurchaseRepository extends JpaRepository<Purchase, Long>, Purch
 
     List<Purchase> findAllByProductId(Long productId);
     List<Purchase> findAllByUserId(Long userId);
+    boolean existsByPaymentId(Long paymentId);
 }

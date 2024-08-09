@@ -18,6 +18,7 @@ import java.util.List;
 import static com.bcsd.shop.exception.errorcode.AuthErrorCode.FORBIDDEN_PRODUCT;
 import static com.bcsd.shop.exception.errorcode.AuthErrorCode.FORBIDDEN_PURCHASE;
 import static com.bcsd.shop.exception.errorcode.PaymentErrorCode.PAYMENT_NOT_FOUND;
+import static com.bcsd.shop.exception.errorcode.ProductErrorCode.INVALID_PRODUCT_STATUS;
 import static com.bcsd.shop.exception.errorcode.ProductErrorCode.PRODUCT_NOT_FOUND;
 import static com.bcsd.shop.exception.errorcode.PurchaseErrorCode.*;
 import static com.bcsd.shop.exception.errorcode.UserErrorCode.USER_NOT_FOUND;
@@ -72,6 +73,10 @@ public class PurchaseService {
 
     @Transactional
     public PurchaseInfoResponse createPurchase(Long userId, PurchaseCreateRequest request) {
+        if (purchaseRepository.existsByPaymentId(request.paymentId())) {
+            throw new CustomException(PURCHASE_DUPLICATED);
+        }
+
         Product product = productRepository.findById(request.productId())
                 .orElseThrow(() -> new CustomException(PRODUCT_NOT_FOUND));
 
@@ -82,6 +87,10 @@ public class PurchaseService {
 
         Payment payment = paymentRepository.findById(request.paymentId())
                 .orElseThrow(() -> new CustomException(PAYMENT_NOT_FOUND));
+
+        if (product.getStatus() != ProductStatus.판매중) {
+            throw new CustomException(INVALID_PRODUCT_STATUS);
+        }
 
         if (request.quantity() > product.getStock()) {
             throw new CustomException(INVALID_OVER_STOCK);
