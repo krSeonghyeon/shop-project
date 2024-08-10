@@ -5,6 +5,7 @@ import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import org.springframework.web.multipart.MultipartFile;
 
 public record ProductCreateRequest(
         @Schema(example = "1", description = "카테고리 번호")
@@ -16,8 +17,7 @@ public record ProductCreateRequest(
         String name,
 
         @Schema(example = "https://example.png", description = "상품 이미지URL")
-        @Size(max = 255, message = "이미지url은 최대 255자까지 가능합니다")
-        String image,
+        MultipartFile image,
 
         @Schema(example = "테스트코드가 매우 빨리돌아갑니다.", description = "상품설명")
         String description,

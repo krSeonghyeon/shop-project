@@ -34,6 +34,7 @@ public class ProductService {
     private final ProductRepository productRepository;
     private final CategoryRepository categoryRepository;
     private final UserRepository userRepository;
+    private final FileService fileService;
 
     public ProductSearchResponse searchProducts(ProductSearchRequest request) {
         Pageable pageable = PageRequest.of(
@@ -123,11 +124,16 @@ public class ProductService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
 
+        String imageUrl = null;
+        if (request.image() != null) {
+            imageUrl = fileService.saveImage(request.image());
+        }
+
         Product newProduct = Product.builder()
                 .category(category)
                 .seller(user)
                 .name(request.name())
-                .image(request.image())
+                .image(imageUrl)
                 .description(request.description())
                 .price(request.price())
                 .shippingCost(request.shippingCost())
@@ -153,10 +159,19 @@ public class ProductService {
         Category newCategory = categoryRepository.findById(request.categoryId())
                 .orElseThrow(() -> new CustomException(CATEGORY_NOT_FOUND));
 
+        String newImageUrl = product.getImage();
+
+        if (request.image() != null) {
+            if (newImageUrl != null) {
+                fileService.deleteImage(newImageUrl);
+            }
+            newImageUrl = fileService.saveImage(request.image());
+        }
+
         product.changeProductInfo(
                 newCategory,
                 request.name(),
-                request.image(),
+                newImageUrl,
                 request.description(),
                 request.price(),
                 request.shippingCost(),
@@ -178,6 +193,10 @@ public class ProductService {
 
         if (!seller.getId().equals(userId)) {
             throw new CustomException(FORBIDDEN_PRODUCT);
+        }
+
+        if (product.getImage() != null) {
+            fileService.deleteImage(product.getImage());
         }
 
         productRepository.deleteById(id);

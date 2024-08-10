@@ -7,6 +7,7 @@ import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import org.springframework.web.multipart.MultipartFile;
 
 public record ProductModifyRequest(
         @Schema(example = "2", description = "변경 할 카테고리 번호")
@@ -18,8 +19,7 @@ public record ProductModifyRequest(
         String name,
 
         @Schema(example = "https://example2.png", description = "변경 할 상품 이미지URL")
-        @Size(max = 255, message = "이미지url은 최대 255자까지 가능합니다")
-        String image,
+        MultipartFile image,
 
         @Schema(example = "테스트코드가 빨리돌아갑니다.", description = "변경 할 상품설명")
         String description,

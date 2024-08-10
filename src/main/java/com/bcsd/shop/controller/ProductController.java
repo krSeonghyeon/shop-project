@@ -5,7 +5,6 @@ import com.bcsd.shop.controller.dto.request.ProductModifyRequest;
 import com.bcsd.shop.controller.dto.request.ProductSearchRequest;
 import com.bcsd.shop.controller.dto.response.ProductInfoResponse;
 import com.bcsd.shop.controller.dto.response.ProductSearchResponse;
-import com.bcsd.shop.controller.dto.response.ProductSimpleInfoResponse;
 import com.bcsd.shop.service.ProductService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -89,7 +88,7 @@ public class ProductController {
     @PostMapping
     public ResponseEntity<ProductInfoResponse> createProduct(
             @Parameter(hidden = true) @SessionAttribute(name = "userId") Long userId,
-            @RequestBody @Valid ProductCreateRequest request
+            @ModelAttribute @Valid ProductCreateRequest request
     ) {
         ProductInfoResponse response = productService.createProduct(userId, request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
@@ -109,7 +108,7 @@ public class ProductController {
     public ResponseEntity<ProductInfoResponse> modifyProduct(
             @Parameter(hidden = true) @SessionAttribute(name = "userId") Long userId,
             @Parameter(in = PATH) @PathVariable Long id,
-            @RequestBody @Valid ProductModifyRequest request
+            @ModelAttribute @Valid ProductModifyRequest request
     ) {
         ProductInfoResponse response = productService.modifyProduct(userId, id, request);
         return ResponseEntity.ok(response);

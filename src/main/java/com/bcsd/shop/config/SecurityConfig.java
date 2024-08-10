@@ -45,7 +45,8 @@ public class SecurityConfig {
                                 .requestMatchers(
                                         HttpMethod.GET,
                                         "/products/{id}",
-                                        "/products/search"
+                                        "/products/search",
+                                        "/images/**"
                                 ).permitAll()
                                 .requestMatchers(HttpMethod.GET, "/users").hasAuthority("USER")
                                 .requestMatchers(HttpMethod.GET, "/users/seller").hasAuthority("SELLER")
