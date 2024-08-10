@@ -1,5 +1,6 @@
 package com.bcsd.shop.controller.dto.request;
 
+import com.bcsd.shop.annotation.ValidEnum;
 import com.bcsd.shop.domain.ProductStatus;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Min;
@@ -40,6 +41,7 @@ public record ProductModifyRequest(
 
         @Schema(example = "판매중", description = "변경 할 상품상태")
         @NotNull(message = "상품상태는 비어있을 수 없습니다")
-        ProductStatus status
+        @ValidEnum(enumClass = ProductStatus.class, message = "상품상태는 '판매예정', '판매중', '판매중지', '품절'만 가능합니다.")
+        String status
 ) {
 }

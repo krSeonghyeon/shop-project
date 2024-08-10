@@ -4,6 +4,7 @@ import com.bcsd.shop.controller.dto.request.PaymentCreateRequest;
 import com.bcsd.shop.controller.dto.request.PaymentModifyStatusRequest;
 import com.bcsd.shop.controller.dto.response.PaymentInfoResponse;
 import com.bcsd.shop.domain.Payment;
+import com.bcsd.shop.domain.PaymentMethod;
 import com.bcsd.shop.domain.PaymentStatus;
 import com.bcsd.shop.exception.CustomException;
 import com.bcsd.shop.repository.PaymentRepository;
@@ -37,7 +38,7 @@ public class PaymentService {
         Payment payment = Payment.builder()
                 .transactionId(request.transactionId())
                 .amount(request.amount())
-                .method(request.method())
+                .method(PaymentMethod.valueOf(request.method()))
                 .build();
 
         // 실제 결제사와 결제 생성 로직이 있다고 가정
@@ -70,11 +71,13 @@ public class PaymentService {
         Payment payment = paymentRepository.findById(id)
                 .orElseThrow(() -> new CustomException(PAYMENT_NOT_FOUND));
 
-        if (payment.getStatus() == request.status()) {
+        PaymentStatus status = PaymentStatus.valueOf(request.status());
+
+        if (payment.getStatus() == status) {
             throw new CustomException(INVALID_SAME_PAYMENT_STATUS);
         }
 
-        payment.changeStatus(request.status());
+        payment.changeStatus(status);
 
         Payment updatedPayment = paymentRepository.saveAndRefresh(payment);
 

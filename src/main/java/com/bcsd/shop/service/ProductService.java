@@ -161,7 +161,7 @@ public class ProductService {
                 request.price(),
                 request.shippingCost(),
                 request.stock(),
-                request.status() //유효하지않은 enum은 json파싱단계에서 HttpMessageNotReadableException발생
+                ProductStatus.valueOf(request.status())
         );
 
         Product updatedProduct = productRepository.saveAndRefresh(product);

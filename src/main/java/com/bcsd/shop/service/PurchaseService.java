@@ -150,11 +150,13 @@ public class PurchaseService {
             throw new CustomException(FORBIDDEN_PRODUCT);
         }
 
-        if (purchase.getStatus() == request.status()) {
+        PurchaseStatus status = PurchaseStatus.valueOf(request.status());
+
+        if (purchase.getStatus() == status) {
             throw new CustomException(INVALID_SAME_PURCHASE_STATUS);
         }
 
-        purchase.changeStatus(request.status());
+        purchase.changeStatus(status);
 
         Purchase updatedPurchase = purchaseRepository.saveAndRefresh(purchase);
 
@@ -198,7 +200,7 @@ public class PurchaseService {
             throw new CustomException(INVALID_PURCHASE_DETERMINE);
         }
 
-        PurchaseStatus status = request.status();
+        PurchaseStatus status = PurchaseStatus.valueOf(request.status());
 
         if (status != PurchaseStatus.반품요청
                 && status != PurchaseStatus.교환요청

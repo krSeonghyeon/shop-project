@@ -1,5 +1,6 @@
 package com.bcsd.shop.controller.dto.request;
 
+import com.bcsd.shop.annotation.ValidEnum;
 import com.bcsd.shop.domain.PaymentMethod;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Min;
@@ -19,6 +20,7 @@ public record PaymentCreateRequest(
 
         @Schema(example = "카드", description = "결제방법")
         @NotNull(message = "결제방법은 비어있을 수 없습니다")
-        PaymentMethod method
+        @ValidEnum(enumClass = PaymentMethod.class, message = "결제방법은 '카드', '계좌이체'만 가능합니다.")
+        String method
 ) {
 }
