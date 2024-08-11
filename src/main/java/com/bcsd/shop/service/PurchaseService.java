@@ -135,7 +135,7 @@ public class PurchaseService {
         try {
             paymentService.cancelPayment(paymentId);
         } catch (Exception ex) {
-            log.error("결제 취소에 실패했습니다. 결제ID: {}", paymentId);
+            log.error("결제 취소에 실패했습니다. 결제ID: {}", paymentId, ex);
         }
     }
 
