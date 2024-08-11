@@ -1,7 +1,6 @@
 package com.bcsd.shop.security;
 
 import com.bcsd.shop.controller.dto.response.CustomExceptionResponse;
-import com.bcsd.shop.exception.CustomException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

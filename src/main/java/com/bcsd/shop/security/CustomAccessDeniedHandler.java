@@ -12,7 +12,6 @@ import org.springframework.stereotype.Component;
 import java.io.IOException;
 
 import static com.bcsd.shop.exception.errorcode.AuthErrorCode.FORBIDDEN_ACCESS;
-import static com.bcsd.shop.exception.errorcode.AuthErrorCode.UNAUTHORIZED_ACCESS;
 
 @Component
 public class CustomAccessDeniedHandler implements AccessDeniedHandler {

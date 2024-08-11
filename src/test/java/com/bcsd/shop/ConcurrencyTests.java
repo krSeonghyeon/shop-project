@@ -161,5 +161,5 @@ public class ConcurrencyTests {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsBytes(request))
         );
-        }
+    }
 }
