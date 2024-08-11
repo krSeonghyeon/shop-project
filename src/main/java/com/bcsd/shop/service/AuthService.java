@@ -27,6 +27,7 @@ import static com.bcsd.shop.exception.errorcode.AuthErrorCode.AUTHENTICATION_FAI
 public class AuthService {
 
     private final AuthenticationManagerBuilder authenticationManager;
+    private static final int SESSION_TIMEOUT_SECONDS = 1800;
 
     @Transactional
     public UserInfoResponse login(LoginRequest loginRequest, HttpServletRequest httpServletRequest) {
@@ -39,10 +40,7 @@ public class AuthService {
 
             User user = ((CustomUserDetails) authentication.getPrincipal()).getUser();
 
-            HttpSession session = httpServletRequest.getSession(true);
-            session.setAttribute("userId", user.getId());
-            session.setAttribute("SPRING_SECURITY_CONTEXT", SecurityContextHolder.getContext());
-            session.setMaxInactiveInterval(1800);
+            createSession(httpServletRequest, user);
 
             return UserInfoResponse.from(user);
         } catch (UsernameNotFoundException | BadCredentialsException e) {
@@ -50,6 +48,13 @@ public class AuthService {
         } catch (AuthenticationException e) {
             throw new CustomException(AUTHENTICATION_ERROR);
         }
+    }
+
+    private static void createSession(HttpServletRequest httpServletRequest, User user) {
+        HttpSession session = httpServletRequest.getSession(true);
+        session.setAttribute("userId", user.getId());
+        session.setAttribute("SPRING_SECURITY_CONTEXT", SecurityContextHolder.getContext());
+        session.setMaxInactiveInterval(SESSION_TIMEOUT_SECONDS);
     }
 
     @Transactional
