@@ -145,10 +145,13 @@
 4주차 (8/8 ~ 8/11)
 </summary>
 
-- readme 추가
-- swagger 추가
-- 전체 코드보완 및 정리
-- 테스트 코드 작성
+- swagger, API문서 추가
+- README 추가
+- 중복 저장 방지 추가
+- 동시성 문제 개선
+- 이미지 파일시스템 추가
+- 예외처리 추가
+- 테스트코드 작성
 
 </details>
 
@@ -158,7 +161,7 @@
 ### [데이터베이스 설계]
 <details>
 <summary>ERD</summary>
-<img width="500" alt="스크린샷 2024-08-06 오후 5 18 59" src="https://github.com/user-attachments/assets/b97a5b3b-edb3-4864-9d30-ab06b19d2906">
+<img width="500" alt="스크린샷 2024-08-11 오후 4 45 22" src="https://github.com/user-attachments/assets/772f60c3-7ef6-4cce-b84a-31354f8015ef">
 </details>
 
 <details>
@@ -170,7 +173,7 @@
 | 컬럼명        | 타입           | 제약조건                                  |
 | ------------- | -------------- | ----------------------------------------- |
 | id            | BIGINT         | PK, AI                                    |
-| email         | VARCHAR(100)   | UQ, NN, UK_USER_EMAIL                     |
+| email         | VARCHAR(100)   | UK, NN                                    |
 | password      | VARCHAR(255)   | NN                                        |
 | name          | VARCHAR(50)    | NN                                        |
 | phone_number  | VARCHAR(20)    | NN                                        |
@@ -181,54 +184,55 @@
 | 컬럼명          | 타입           | 제약조건                             |
 | --------------- | -------------- | ------------------------------------ |
 | id              | BIGINT         | PK, AI                               |
-| user_id         | BIGINT         | FK, UQ, NN, UK_SELLER_USER           |
-| company_name    | VARCHAR(100)   | NN                                    |
-| business_number | VARCHAR(20)    | UQ, NN, UK_SELLER_BUSINESS_NUMBER    |
+| user_id         | BIGINT         | FK, UK, NN                           |
+| company_name    | VARCHAR(100)   | NN                                   |
+| business_number | VARCHAR(20)    | UK, NN                               |
 
 ### 권한 (authority)
 | 컬럼명 | 타입         | 제약조건                       |
 | ------ | ------------ | ------------------------------ |
 | id     | BIGINT       | PK, AI                         |
-| type   | VARCHAR(20)  | UQ, NN, UK_AUTHORITY_TYPE      |
+| type   | VARCHAR(20)  | UK, NN                         |
 
 ### 유저권한 (user_authority)
 | 컬럼명       | 타입   | 제약조건                      |
 | ------------ | ------ | ----------------------------- |
 | id           | BIGINT | PK, AI                        |
-| user_id      | BIGINT | FK, NN, UQ(복합)              |
-| authority_id | BIGINT | FK, NN, UQ(복합)              |
+| user_id      | BIGINT | FK, NN, UK(복합)              |
+| authority_id | BIGINT | FK, NN, UK(복합)              |
 
 ### 상품 카테고리 (category)
 | 컬럼명 | 타입         | 제약조건                   |
 | ------ | ------------ | -------------------------- |
 | id     | BIGINT       | PK, AI                     |
-| name   | VARCHAR(100) | UQ, NN, UK_CATEGORY_NAME   |
+| name   | VARCHAR(100) | UK, NN                     |
 
 ### 상품 (product)
 | 컬럼명        | 타입                   | 제약조건                                       |
 | ------------- | ---------------------- | ---------------------------------------------  |
 | id            | BIGINT                 | PK, AI                                         |
 | category_id   | BIGINT                 | FK                                             |
-| seller_id     | BIGINT                 | FK                                             |
-| name          | VARCHAR(255)           | NN                                             |
+| seller_id     | BIGINT                 | FK, UK(복합)                                   |
+| name          | VARCHAR(255)           | NN, UK(복합)                                   |
 | image         | VARCHAR(255)           |                                                |
 | description   | TEXT                   |                                                |
 | price         | BIGINT UNSIGNED        | NN                                             |
 | shipping_cost | INT UNSIGNED           | NN                                             |
 | stock         | INT UNSIGNED           | NN                                             |
-| status        | ENUM('판매예정', '판매중', '판매중지', '품절') | NN, DEFAULT '판매예정'         |
+| status        | ENUM('판매예정', '판매중', '판매중지', '품절') | NN, DEFAULT '판매중'            |
 | created_at    | TIMESTAMP              | DEFAULT CURRENT_TIMESTAMP, NN                  |
 | updated_at    | TIMESTAMP              | DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, NN |
 
 ### 결제 (payment)
-| 컬럼명    | 타입                 | 제약조건                                        |
-| --------- | -------------------- | ---------------------------------------------- |
-| id        | BIGINT               | PK, AI                                         |
-| amount    | BIGINT UNSIGNED      | NN                                             |
-| method    | ENUM('카드', '계좌이체') | NN                                          |
-| status    | ENUM('정상결제', '환불완료') | NN, DEFAULT '정상결제'                    |
-| created_at| TIMESTAMP            | DEFAULT CURRENT_TIMESTAMP, NN                  |
-| updated_at| TIMESTAMP            | DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, NN |
+| 컬럼명        | 타입                   | 제약조건                                        |
+| ------------- | ---------------------- | ---------------------------------------------- |
+| id            | BIGINT                 | PK, AI                                         |
+| transaction_id| VARCHAR(50)            | NN, UK                                         |
+| amount        | BIGINT UNSIGNED        | NN                                             |
+| method        | ENUM('카드', '계좌이체') | NN                                           |
+| status        | ENUM('정상결제', '취소신청', '환불완료') | NN, DEFAULT '정상결제'                  |
+| created_at    | TIMESTAMP              | DEFAULT CURRENT_TIMESTAMP, NN                  |
+| updated_at    | TIMESTAMP              | DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, NN |
 
 ### 주문 (purchase)
 | 컬럼명           | 타입                   | 제약조건                                       |
@@ -237,7 +241,7 @@
 | product_id       | BIGINT                 | FK, NN                                        |
 | user_id          | BIGINT                 | FK, NN                                        |
 | seller_id        | BIGINT                 | FK, NN                                        |
-| payment_id       | BIGINT                 | FK, NN                                        |
+| payment_id       | BIGINT                 | FK, NN, UK                                    |
 | price            | BIGINT UNSIGNED        | NN                                            |
 | quantity         | INT UNSIGNED           | NN                                            |
 | shipping_cost    | INT UNSIGNED           | NN                                            |
@@ -246,6 +250,7 @@
 | status           | ENUM('결제완료', '배송중', '구매확정', '취소요청', '취소완료', '반품요청', '반품완료', '교환요청', '교환완료') | NN, DEFAULT '결제완료' |
 | created_at       | TIMESTAMP              | DEFAULT CURRENT_TIMESTAMP, NN                  |
 | updated_at       | TIMESTAMP              | DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, NN |
+
 </details>
 
 
@@ -267,3 +272,5 @@
 
 ## 📕 API문서
 [API문서](https://krSeonghyeon.github.io/shop-project/shopapi-docs.html)
+
+[swagger(로컬)](http://localhost:8080/swagger-ui.html)
