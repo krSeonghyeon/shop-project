@@ -9,6 +9,7 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
 public record PaymentCreateRequest(
+        @Schema(example = "safsdafjsa", description = "트랜잭션ID")
         @NotBlank(message = "트랜잭션ID는 비어있을 수 없습니다")
         @Size(max = 50, message = "트랜잭션ID는 50자이하여야 합니다")
         String transactionId,
@@ -18,7 +19,7 @@ public record PaymentCreateRequest(
         @Min(value = 0, message = "결제금액은 0이상이어야 합니다")
         Long amount,
 
-        @Schema(example = "카드", description = "결제방법")
+        @Schema(example = "카드", description = "결제방법 '카드', '계좌이체'")
         @NotNull(message = "결제방법은 비어있을 수 없습니다")
         @ValidEnum(enumClass = PaymentMethod.class, message = "결제방법은 '카드', '계좌이체'만 가능합니다.")
         String method

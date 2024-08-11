@@ -39,7 +39,7 @@ public record ProductModifyRequest(
         @Min(value = 0, message = "재고는 0이상이어야 합니다")
         Integer stock,
 
-        @Schema(example = "판매중", description = "변경 할 상품상태")
+        @Schema(example = "판매중", description = "변경 할 상품상태 '판매예정', '판매중', '판매중지', '품절'")
         @NotNull(message = "상품상태는 비어있을 수 없습니다")
         @ValidEnum(enumClass = ProductStatus.class, message = "상품상태는 '판매예정', '판매중', '판매중지', '품절'만 가능합니다.")
         String status
