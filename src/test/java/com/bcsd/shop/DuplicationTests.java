@@ -2,6 +2,8 @@ package com.bcsd.shop;
 
 import com.bcsd.shop.controller.dto.request.PaymentCreateRequest;
 import com.bcsd.shop.controller.dto.request.UserJoinRequest;
+import com.bcsd.shop.domain.User;
+import com.bcsd.shop.repository.UserRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -9,10 +11,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockHttpSession;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.transaction.annotation.Transactional;
 
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -27,6 +33,9 @@ class DuplicationTests {
     @Autowired
     private ObjectMapper objectMapper;
 
+    @Autowired
+    private UserRepository userRepository;
+
     @Test
     @DisplayName("회원가입 중복 방지 테스트")
     void 회원가입_중복_방지_테스트() throws Exception {
@@ -39,16 +48,17 @@ class DuplicationTests {
         );
 
         // 첫번째 회원가입
-        mockMvc.perform(post("/users")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsBytes(request))
-        ).andExpect(status().isCreated());
+        createUser(request).andExpect(status().isCreated());
 
         // 중복 회원가입 시도
-        mockMvc.perform(post("/users")
+        createUser(request).andExpect(status().isConflict());
+    }
+
+    private ResultActions createUser(UserJoinRequest request) throws Exception {
+        return mockMvc.perform(post("/users")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsBytes(request))
-        ).andExpect(status().isConflict());
+        );
     }
 
     @Test
@@ -62,15 +72,60 @@ class DuplicationTests {
         );
 
         // 첫번째 결제
-        mockMvc.perform(post("/payments")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsBytes(request))
-        ).andExpect(status().isCreated());
+        createPayment(request).andExpect(status().isCreated());
 
         // 중복 결제 시도
-        mockMvc.perform(post("/payments")
+        createPayment(request).andExpect(status().isConflict());
+    }
+
+    private ResultActions createPayment(PaymentCreateRequest request) throws Exception {
+        return mockMvc.perform(post("/payments")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsBytes(request))
-        ).andExpect(status().isConflict());
+        );
+    }
+
+    @Test
+    @WithMockUser(username = "sellerUser", authorities = {"SELLER"})
+    @DisplayName("상품등록 중복 방지 테스트")
+    void 상품등록_중복_방지_테스트() throws Exception {
+        User sellerUser = User.builder()
+                .email("seller@example.com")
+                .password("seller")
+                .name("판매자")
+                .phoneNumber("041-123-4567")
+                .address("한기대")
+                .build();
+        sellerUser = userRepository.save(sellerUser);
+
+        MockMultipartFile imageFile = new MockMultipartFile(
+                "image",
+                "image.png",
+                "image/png",
+                "image-content".getBytes()
+        );
+
+        MockHttpSession session = new MockHttpSession();
+        session.setAttribute("userId", sellerUser.getId());
+
+        // 첫번째 상품등록
+        createProduct(imageFile, session).andExpect(status().isCreated());
+
+        // 중복 등록 시도
+        createProduct(imageFile, session).andExpect(status().isConflict());
+    }
+
+    private ResultActions createProduct(MockMultipartFile imageFile, MockHttpSession session) throws Exception {
+        return mockMvc.perform(multipart("/products")
+                .file(imageFile)
+                .param("categoryId", "1")
+                .param("name", "중복테스트상품")
+                .param("description", "상품등록중복테스트입니다")
+                .param("price", "2000000")
+                .param("shippingCost", "3000")
+                .param("stock", "100")
+                .session(session)
+                .contentType(MediaType.MULTIPART_FORM_DATA)
+        );
     }
 }
