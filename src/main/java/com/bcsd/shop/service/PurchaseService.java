@@ -100,6 +100,12 @@ public class PurchaseService {
                 throw new CustomException(INVALID_OVER_STOCK);
             }
 
+            long amount = product.getPrice() * request.quantity() + product.getShippingCost();
+
+            if (payment.getAmount() != amount) {
+                throw new CustomException(INVALID_PAYMENT_AMOUNT);
+            }
+
             product.decreaseStock(request.quantity());
 
             if (product.getStock() == 0) {

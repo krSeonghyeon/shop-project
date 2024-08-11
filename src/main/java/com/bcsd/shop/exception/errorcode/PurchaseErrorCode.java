@@ -16,6 +16,7 @@ public enum PurchaseErrorCode implements ErrorCode {
     INVALID_PURCHASE_CANCEL("400_INVALID_PURCHASE_CANCEL", HttpStatus.BAD_REQUEST, "취소할 수 없는 상태의 주문입니다."),
     INVALID_PURCHASE_STATUS("400_INVALID_PURCHASE_STATUS", HttpStatus.BAD_REQUEST, "올바르지 않은 상태로의 변경요청입니다."),
     INVALID_PURCHASE_DETERMINE("400_INVALID_PURCHASE_DETERMINE", HttpStatus.BAD_REQUEST, "구매 결정이 불가능한 상태입니다."),
+    INVALID_PAYMENT_AMOUNT("400_INVALID_PAYMENT_AMOUNT", HttpStatus.BAD_REQUEST, "결제금액과 구매가격이 같지 않습니다."),
     FAILED_PURCHASE("500_FAILED_PURCHASE", HttpStatus.INTERNAL_SERVER_ERROR, "예상치 못한 에러로 주문에 실패했습니다.");
 
     private final String code;
