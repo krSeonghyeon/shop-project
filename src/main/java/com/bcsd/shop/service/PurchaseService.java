@@ -92,25 +92,10 @@ public class PurchaseService {
             Payment payment = paymentRepository.findById(request.paymentId())
                     .orElseThrow(() -> new CustomException(PAYMENT_NOT_FOUND));
 
-            if (product.getStatus() != ProductStatus.판매중) {
-                throw new CustomException(INVALID_PRODUCT_STATUS);
-            }
+            validateProductAvailability(product, request.quantity());
+            validatePaymentAmount(product, payment, request.quantity());
 
-            if (request.quantity() > product.getStock()) {
-                throw new CustomException(INVALID_OVER_STOCK);
-            }
-
-            long amount = product.getPrice() * request.quantity() + product.getShippingCost();
-
-            if (payment.getAmount() != amount) {
-                throw new CustomException(INVALID_PAYMENT_AMOUNT);
-            }
-
-            product.decreaseStock(request.quantity());
-
-            if (product.getStock() == 0) {
-                product.changeStatus(ProductStatus.품절);
-            }
+            updateProductStock(product, request.quantity());
 
             Purchase purchase = Purchase.builder()
                     .product(product)
@@ -134,6 +119,31 @@ public class PurchaseService {
             log.error("주문에서 예상치 못한 예외가 발생했습니다. 요청 정보: {}, 에러 메시지: {}", request, e.getMessage());
             handlePaymentCancel(request.paymentId());
             throw new CustomException(FAILED_PURCHASE);
+        }
+    }
+
+    private static void validateProductAvailability(Product product, int quantity) {
+        if (product.getStatus() != ProductStatus.판매중) {
+            throw new CustomException(INVALID_PRODUCT_STATUS);
+        }
+
+        if (quantity > product.getStock()) {
+            throw new CustomException(INVALID_OVER_STOCK);
+        }
+    }
+
+    private static void validatePaymentAmount(Product product, Payment payment, int quantity) {
+        long amount = product.getPrice() * quantity + product.getShippingCost();
+        if (payment.getAmount() != amount) {
+            throw new CustomException(INVALID_PAYMENT_AMOUNT);
+        }
+    }
+
+    private static void updateProductStock(Product product, int quantity) {
+        product.decreaseStock(quantity);
+
+        if (product.getStock() == 0) {
+            product.changeStatus(ProductStatus.품절);
         }
     }
 
