@@ -730,9 +730,14 @@
   }
 };
             defs["PaymentCreateRequest"] = {
-  "required" : [ "amount", "method" ],
+  "required" : [ "amount", "method", "transactionId" ],
   "type" : "object",
   "properties" : {
+    "transactionId" : {
+      "maxLength" : 50,
+      "minLength" : 0,
+      "type" : "string"
+    },
     "amount" : {
       "minimum" : 0,
       "type" : "integer",
@@ -743,8 +748,7 @@
     "method" : {
       "type" : "string",
       "description" : "결제방법",
-      "example" : "카드",
-      "enum" : [ "카드", "계좌이체" ]
+      "example" : "카드"
     }
   }
 };
@@ -754,6 +758,9 @@
     "id" : {
       "type" : "integer",
       "format" : "int64"
+    },
+    "transactionId" : {
+      "type" : "string"
     },
     "amount" : {
       "type" : "integer",
@@ -784,8 +791,7 @@
     "status" : {
       "type" : "string",
       "description" : "새결제상태",
-      "example" : "환불완료",
-      "enum" : [ "정상결제", "취소신청", "환불완료" ]
+      "example" : "환불완료"
     }
   }
 };
@@ -807,11 +813,8 @@
       "example" : "맥북M5"
     },
     "image" : {
-      "maxLength" : 255,
-      "minLength" : 0,
       "type" : "string",
-      "description" : "상품 이미지URL",
-      "example" : "https://example.png"
+      "format" : "binary"
     },
     "description" : {
       "type" : "string",
@@ -907,11 +910,8 @@
       "example" : "맥북M4"
     },
     "image" : {
-      "maxLength" : 255,
-      "minLength" : 0,
       "type" : "string",
-      "description" : "변경 할 상품 이미지URL",
-      "example" : "https://example2.png"
+      "format" : "binary"
     },
     "description" : {
       "type" : "string",
@@ -942,8 +942,7 @@
     "status" : {
       "type" : "string",
       "description" : "변경 할 상품상태",
-      "example" : "판매중",
-      "enum" : [ "판매예정", "판매중", "판매중지", "품절" ]
+      "example" : "판매중"
     }
   }
 };
@@ -1160,8 +1159,7 @@
     "status" : {
       "type" : "string",
       "description" : "새 주문상태",
-      "example" : "배송중",
-      "enum" : [ "결제완료", "배송중", "구매확정", "취소요청", "취소완료", "반품요청", "반품완료", "교환요청", "교환완료" ]
+      "example" : "배송중"
     }
   }
 };
@@ -1391,6 +1389,9 @@
                     </li>
                     <li data-group="" data-name="determinePurchase" class="">
                       <a href="#api--determinePurchase">determinePurchase</a>
+                    </li>
+                    <li data-group="" data-name="getImage" class="">
+                      <a href="#api--getImage">getImage</a>
                     </li>
                     <li data-group="" data-name="getPayment" class="">
                       <a href="#api--getPayment">getPayment</a>
@@ -2439,6 +2440,14 @@ except ApiException as e:
                             <div class="tab-content" style='margin-bottom: 10px;'>
                             </div>
 
+                            <h3> Status: 409 - Conflict </h3>
+
+                            <ul class="nav nav-tabs nav-tabs-examples" >
+                            </ul>
+
+                            <div class="tab-content" style='margin-bottom: 10px;'>
+                            </div>
+
                         </article>
                       </div>
                       <hr>
@@ -2528,7 +2537,7 @@ public class DefaultApiExample {
   <pre class="prettyprint language-json prettyprinted" data-type="json"><code>Coming Soon!</code></pre>
   </div> -->
                             <div class="tab-pane" id="examples--createProduct-0-objc">
-                              <pre class="prettyprint"><code class="language-cpp">ProductCreateRequest *body = ; // 
+                              <pre class="prettyprint"><code class="language-cpp">ProductCreateRequest *body = ; //  (optional)
 
 DefaultApi *apiInstance = [[DefaultApi alloc] init];
 
@@ -2549,8 +2558,9 @@ DefaultApi *apiInstance = [[DefaultApi alloc] init];
                               <pre class="prettyprint"><code class="language-js">var ShopApi = require('shop_api');
 
 var api = new ShopApi.DefaultApi()
-var body = ; // {{ProductCreateRequest}} 
-
+var opts = { 
+  'body':  // {{ProductCreateRequest}} 
+};
 var callback = function(error, data, response) {
   if (error) {
     console.error(error);
@@ -2558,7 +2568,7 @@ var callback = function(error, data, response) {
     console.log('API called successfully. Returned data: ' + data);
   }
 };
-api.createProduct(body, callback);
+api.createProduct(opts, callback);
 </code></pre>
                             </div>
 
@@ -2580,7 +2590,7 @@ namespace Example
         {
 
             var apiInstance = new DefaultApi();
-            var body = new ProductCreateRequest(); // ProductCreateRequest | 
+            var body = new ProductCreateRequest(); // ProductCreateRequest |  (optional) 
 
             try
             {
@@ -2640,11 +2650,11 @@ from pprint import pprint
 
 # create an instance of the API class
 api_instance = swagger_client.DefaultApi()
-body =  # ProductCreateRequest | 
+body =  # ProductCreateRequest |  (optional)
 
 try: 
     # 상품등록
-    api_response = api_instance.create_product(body)
+    api_response = api_instance.create_product(body=body)
     pprint(api_response)
 except ApiException as e:
     print("Exception when calling DefaultApi->createProduct: %s\n" % e)</code></pre>
@@ -2661,7 +2671,7 @@ except ApiException as e:
                                 <th width="150px">Name</th>
                                 <th>Description</th>
                               </tr>
-                                <tr><td style="width:150px;">body <span style="color:red;">*</span></td>
+                                <tr><td style="width:150px;">body </td>
                                 <td>
                                 
                                 
@@ -2674,8 +2684,7 @@ except ApiException as e:
         "$ref" : "#/components/schemas/ProductCreateRequest"
       }
     }
-  },
-  "required" : true
+  }
 };
                                   var schema = schemaWrapper.content["application/json"].schema;
                                   if (schema.$ref != null) {
@@ -2775,6 +2784,14 @@ except ApiException as e:
                             </div>
 
                             <h3> Status: 404 - Not Found </h3>
+
+                            <ul class="nav nav-tabs nav-tabs-examples" >
+                            </ul>
+
+                            <div class="tab-content" style='margin-bottom: 10px;'>
+                            </div>
+
+                            <h3> Status: 409 - Conflict </h3>
 
                             <ul class="nav nav-tabs nav-tabs-examples" >
                             </ul>
@@ -3118,6 +3135,14 @@ except ApiException as e:
                             </div>
 
                             <h3> Status: 404 - Not Found </h3>
+
+                            <ul class="nav nav-tabs nav-tabs-examples" >
+                            </ul>
+
+                            <div class="tab-content" style='margin-bottom: 10px;'>
+                            </div>
+
+                            <h3> Status: 409 - Conflict </h3>
 
                             <ul class="nav nav-tabs nav-tabs-examples" >
                             </ul>
@@ -3993,6 +4018,317 @@ except ApiException as e:
                             </div>
 
                             <h3> Status: 404 - Not Found </h3>
+
+                            <ul class="nav nav-tabs nav-tabs-examples" >
+                            </ul>
+
+                            <div class="tab-content" style='margin-bottom: 10px;'>
+                            </div>
+
+                        </article>
+                      </div>
+                      <hr>
+                    <div id="api--getImage">
+                      <article id="api--getImage-0" data-group="User" data-name="getImage" data-version="0">
+                        <div class="pull-left">
+                          <h1>getImage</h1>
+                          <p>이미지조회</p>
+                        </div>
+                        <div class="pull-right"></div>
+                        <div class="clearfix"></div>
+                        <p></p>
+                        <p class="marked"></p>
+                        <p></p>
+                        <br />
+                        <pre class="prettyprint language-html prettyprinted" data-type="get"><code><span class="pln">/images/{fileName}</span></code></pre>
+                        <p>
+                          <h3>Usage and SDK Samples</h3>
+                        </p>
+                        <ul class="nav nav-tabs nav-tabs-examples">
+                          <li class="active"><a href="#examples--getImage-0-curl">Curl</a></li>
+                          <li class=""><a href="#examples--getImage-0-java">Java</a></li>
+                          <li class=""><a href="#examples--getImage-0-android">Android</a></li>
+                          <!--<li class=""><a href="#examples--getImage-0-groovy">Groovy</a></li>-->
+                          <li class=""><a href="#examples--getImage-0-objc">Obj-C</a></li>
+                          <li class=""><a href="#examples--getImage-0-javascript">JavaScript</a></li>
+                          <!--<li class=""><a href="#examples--getImage-0-angular">Angular</a></li>-->
+                          <li class=""><a href="#examples--getImage-0-csharp">C#</a></li>
+                          <li class=""><a href="#examples--getImage-0-php">PHP</a></li>
+                          <li class=""><a href="#examples--getImage-0-perl">Perl</a></li>
+                          <li class=""><a href="#examples--getImage-0-python">Python</a></li>
+                        </ul>
+
+                        <div class="tab-content">
+                          <div class="tab-pane active" id="examples--getImage-0-curl">
+                           <pre class="prettyprint"><code class="language-bsh">curl -X GET\
+-H "Accept: */*"\
+"http://localhost:8080/images/{fileName}"</code></pre>
+                          </div>
+                          <div class="tab-pane" id="examples--getImage-0-java">
+                            <pre class="prettyprint"><code class="language-java">import io.swagger.client.*;
+import io.swagger.client.auth.*;
+import io.swagger.client.model.*;
+import io.swagger.client.api.DefaultApi;
+
+import java.io.File;
+import java.util.*;
+
+public class DefaultApiExample {
+
+    public static void main(String[] args) {
+        
+        DefaultApi apiInstance = new DefaultApi();
+        String fileName = fileName_example; // String | 
+        try {
+            byte[] result = apiInstance.getImage(fileName);
+            System.out.println(result);
+        } catch (ApiException e) {
+            System.err.println("Exception when calling DefaultApi#getImage");
+            e.printStackTrace();
+        }
+    }
+}</code></pre>
+                          </div>
+
+                          <div class="tab-pane" id="examples--getImage-0-android">
+                            <pre class="prettyprint"><code class="language-java">import io.swagger.client.api.DefaultApi;
+
+public class DefaultApiExample {
+
+    public static void main(String[] args) {
+        DefaultApi apiInstance = new DefaultApi();
+        String fileName = fileName_example; // String | 
+        try {
+            byte[] result = apiInstance.getImage(fileName);
+            System.out.println(result);
+        } catch (ApiException e) {
+            System.err.println("Exception when calling DefaultApi#getImage");
+            e.printStackTrace();
+        }
+    }
+}</code></pre>
+                          </div>
+  <!--
+  <div class="tab-pane" id="examples--getImage-0-groovy">
+  <pre class="prettyprint language-json prettyprinted" data-type="json"><code>Coming Soon!</code></pre>
+  </div> -->
+                            <div class="tab-pane" id="examples--getImage-0-objc">
+                              <pre class="prettyprint"><code class="language-cpp">String *fileName = fileName_example; // 
+
+DefaultApi *apiInstance = [[DefaultApi alloc] init];
+
+// 이미지조회
+[apiInstance getImageWith:fileName
+              completionHandler: ^(byte[] output, NSError* error) {
+                            if (output) {
+                                NSLog(@"%@", output);
+                            }
+                            if (error) {
+                                NSLog(@"Error: %@", error);
+                            }
+                        }];
+</code></pre>
+                            </div>
+
+                            <div class="tab-pane" id="examples--getImage-0-javascript">
+                              <pre class="prettyprint"><code class="language-js">var ShopApi = require('shop_api');
+
+var api = new ShopApi.DefaultApi()
+var fileName = fileName_example; // {{String}} 
+
+var callback = function(error, data, response) {
+  if (error) {
+    console.error(error);
+  } else {
+    console.log('API called successfully. Returned data: ' + data);
+  }
+};
+api.getImage(fileName, callback);
+</code></pre>
+                            </div>
+
+                            <!--<div class="tab-pane" id="examples--getImage-0-angular">
+              <pre class="prettyprint language-json prettyprinted" data-type="json"><code>Coming Soon!</code></pre>
+            </div>-->
+                            <div class="tab-pane" id="examples--getImage-0-csharp">
+                              <pre class="prettyprint"><code class="language-cs">using System;
+using System.Diagnostics;
+using IO.Swagger.Api;
+using IO.Swagger.Client;
+using IO.Swagger.Model;
+
+namespace Example
+{
+    public class getImageExample
+    {
+        public void main()
+        {
+
+            var apiInstance = new DefaultApi();
+            var fileName = fileName_example;  // String | 
+
+            try
+            {
+                // 이미지조회
+                byte[] result = apiInstance.getImage(fileName);
+                Debug.WriteLine(result);
+            }
+            catch (Exception e)
+            {
+                Debug.Print("Exception when calling DefaultApi.getImage: " + e.Message );
+            }
+        }
+    }
+}
+</code></pre>
+                            </div>
+
+                            <div class="tab-pane" id="examples--getImage-0-php">
+                              <pre class="prettyprint"><code class="language-php"><&#63;php
+require_once(__DIR__ . '/vendor/autoload.php');
+
+$api_instance = new Swagger\Client\ApiDefaultApi();
+$fileName = fileName_example; // String | 
+
+try {
+    $result = $api_instance->getImage($fileName);
+    print_r($result);
+} catch (Exception $e) {
+    echo 'Exception when calling DefaultApi->getImage: ', $e->getMessage(), PHP_EOL;
+}
+?></code></pre>
+                            </div>
+
+                            <div class="tab-pane" id="examples--getImage-0-perl">
+                              <pre class="prettyprint"><code class="language-perl">use Data::Dumper;
+use WWW::SwaggerClient::Configuration;
+use WWW::SwaggerClient::DefaultApi;
+
+my $api_instance = WWW::SwaggerClient::DefaultApi->new();
+my $fileName = fileName_example; # String | 
+
+eval { 
+    my $result = $api_instance->getImage(fileName => $fileName);
+    print Dumper($result);
+};
+if ($@) {
+    warn "Exception when calling DefaultApi->getImage: $@\n";
+}</code></pre>
+                            </div>
+
+                            <div class="tab-pane" id="examples--getImage-0-python">
+                              <pre class="prettyprint"><code class="language-python">from __future__ import print_statement
+import time
+import swagger_client
+from swagger_client.rest import ApiException
+from pprint import pprint
+
+# create an instance of the API class
+api_instance = swagger_client.DefaultApi()
+fileName = fileName_example # String | 
+
+try: 
+    # 이미지조회
+    api_response = api_instance.get_image(fileName)
+    pprint(api_response)
+except ApiException as e:
+    print("Exception when calling DefaultApi->getImage: %s\n" % e)</code></pre>
+                            </div>
+                          </div>
+
+                          <h2>Parameters</h2>
+
+                            <div class="methodsubtabletitle">Path parameters</div>
+                            <table id="methodsubtable">
+                                <tr>
+                                  <th width="150px">Name</th>
+                                  <th>Description</th>
+                                </tr>
+                                  <tr><td style="width:150px;">fileName*</td>
+                                  <td>
+                                  
+                                  
+                                      <div id="d2e199_getImage_fileName">
+                                          <div class="json-schema-view">
+                                              <div class="primitive">
+                                                  <span class="type">
+                                                      String
+                                                  </span>
+                                  
+                                              </div>
+                                                  <div class="inner required">
+                                                      Required
+                                                  </div>
+                                          </div>
+                                      </div>
+                                  </td>
+                                  </tr>
+                            </table>
+
+
+
+
+
+                          <h2>Responses</h2>
+                            <h3> Status: 200 - OK </h3>
+
+                            <ul class="nav nav-tabs nav-tabs-examples" >
+                                <li class="active">
+                                  <a data-toggle="tab" href="#responses-getImage-200-schema">Schema</a>
+                                </li>
+
+                            </ul>
+
+                            <div class="tab-content" style='margin-bottom: 10px;'>
+                                <div class="tab-pane active" id="responses-getImage-200-schema">
+                                  <div id='responses-getImage-200-schema-200' style="padding: 30px; border-left: 1px solid #eee; border-right: 1px solid #eee; border-bottom: 1px solid #eee;">
+                                    <script>
+                                      $(document).ready(function() {
+                                        var schemaWrapper = {
+  "description" : "OK",
+  "content" : {
+    "*/*" : {
+      "schema" : {
+        "type" : "string",
+        "format" : "binary",
+        "x-content-type" : "*/*"
+      }
+    }
+  }
+};
+                                        var schema = schemaWrapper.content["*/*"].schema;
+                                        if (schema.$ref != null) {
+                                          schema = defsParser.$refs.get(schema.$ref);
+                                        } else {
+                                          schemaWrapper.components = {};
+                                          schemaWrapper.components.schemas = Object.assign({}, defs);
+                                          $RefParser.dereference(schemaWrapper).catch(function(err) {
+                                            console.log(err);
+                                          });
+                                        }
+
+                                        //console.log(JSON.stringify(schema));
+                                        var view = new JSONSchemaView(schema, 3);
+                                        $('#responses-getImage-200-schema-data').val(stringify(schema));
+                                        var result = $('#responses-getImage-200-schema-200');
+                                        result.empty();
+                                        result.append(view.render());
+                                      });
+                                    </script>
+                                  </div>
+                                  <input id='responses-getImage-200-schema-data' type='hidden' value=''></input>
+                                </div>
+                            </div>
+
+                            <h3> Status: 404 - Not Found </h3>
+
+                            <ul class="nav nav-tabs nav-tabs-examples" >
+                            </ul>
+
+                            <div class="tab-content" style='margin-bottom: 10px;'>
+                            </div>
+
+                            <h3> Status: 500 - Internal Server Error </h3>
 
                             <ul class="nav nav-tabs nav-tabs-examples" >
                             </ul>
@@ -7916,10 +8252,10 @@ public class DefaultApiExample {
     public static void main(String[] args) {
         
         DefaultApi apiInstance = new DefaultApi();
-        ProductModifyRequest body = ; // ProductModifyRequest | 
         Long id = 789; // Long | 
+        ProductModifyRequest body = ; // ProductModifyRequest | 
         try {
-            ProductInfoResponse result = apiInstance.modifyProduct(body, id);
+            ProductInfoResponse result = apiInstance.modifyProduct(id, body);
             System.out.println(result);
         } catch (ApiException e) {
             System.err.println("Exception when calling DefaultApi#modifyProduct");
@@ -7936,10 +8272,10 @@ public class DefaultApiExample {
 
     public static void main(String[] args) {
         DefaultApi apiInstance = new DefaultApi();
-        ProductModifyRequest body = ; // ProductModifyRequest | 
         Long id = 789; // Long | 
+        ProductModifyRequest body = ; // ProductModifyRequest | 
         try {
-            ProductInfoResponse result = apiInstance.modifyProduct(body, id);
+            ProductInfoResponse result = apiInstance.modifyProduct(id, body);
             System.out.println(result);
         } catch (ApiException e) {
             System.err.println("Exception when calling DefaultApi#modifyProduct");
@@ -7953,14 +8289,14 @@ public class DefaultApiExample {
   <pre class="prettyprint language-json prettyprinted" data-type="json"><code>Coming Soon!</code></pre>
   </div> -->
                             <div class="tab-pane" id="examples--modifyProduct-0-objc">
-                              <pre class="prettyprint"><code class="language-cpp">ProductModifyRequest *body = ; // 
-Long *id = 789; // 
+                              <pre class="prettyprint"><code class="language-cpp">Long *id = 789; // 
+ProductModifyRequest *body = ; //  (optional)
 
 DefaultApi *apiInstance = [[DefaultApi alloc] init];
 
 // 상품정보 수정
-[apiInstance modifyProductWith:body
-    id:id
+[apiInstance modifyProductWith:id
+    body:body
               completionHandler: ^(ProductInfoResponse output, NSError* error) {
                             if (output) {
                                 NSLog(@"%@", output);
@@ -7976,9 +8312,10 @@ DefaultApi *apiInstance = [[DefaultApi alloc] init];
                               <pre class="prettyprint"><code class="language-js">var ShopApi = require('shop_api');
 
 var api = new ShopApi.DefaultApi()
-var body = ; // {{ProductModifyRequest}} 
 var id = 789; // {{Long}} 
-
+var opts = { 
+  'body':  // {{ProductModifyRequest}} 
+};
 var callback = function(error, data, response) {
   if (error) {
     console.error(error);
@@ -7986,7 +8323,7 @@ var callback = function(error, data, response) {
     console.log('API called successfully. Returned data: ' + data);
   }
 };
-api.modifyProduct(bodyid, callback);
+api.modifyProduct(id, opts, callback);
 </code></pre>
                             </div>
 
@@ -8008,13 +8345,13 @@ namespace Example
         {
 
             var apiInstance = new DefaultApi();
-            var body = new ProductModifyRequest(); // ProductModifyRequest | 
             var id = 789;  // Long | 
+            var body = new ProductModifyRequest(); // ProductModifyRequest |  (optional) 
 
             try
             {
                 // 상품정보 수정
-                ProductInfoResponse result = apiInstance.modifyProduct(body, id);
+                ProductInfoResponse result = apiInstance.modifyProduct(id, body);
                 Debug.WriteLine(result);
             }
             catch (Exception e)
@@ -8032,11 +8369,11 @@ namespace Example
 require_once(__DIR__ . '/vendor/autoload.php');
 
 $api_instance = new Swagger\Client\ApiDefaultApi();
-$body = ; // ProductModifyRequest | 
 $id = 789; // Long | 
+$body = ; // ProductModifyRequest | 
 
 try {
-    $result = $api_instance->modifyProduct($body, $id);
+    $result = $api_instance->modifyProduct($id, $body);
     print_r($result);
 } catch (Exception $e) {
     echo 'Exception when calling DefaultApi->modifyProduct: ', $e->getMessage(), PHP_EOL;
@@ -8050,11 +8387,11 @@ use WWW::SwaggerClient::Configuration;
 use WWW::SwaggerClient::DefaultApi;
 
 my $api_instance = WWW::SwaggerClient::DefaultApi->new();
-my $body = WWW::SwaggerClient::Object::ProductModifyRequest->new(); # ProductModifyRequest | 
 my $id = 789; # Long | 
+my $body = WWW::SwaggerClient::Object::ProductModifyRequest->new(); # ProductModifyRequest | 
 
 eval { 
-    my $result = $api_instance->modifyProduct(body => $body, id => $id);
+    my $result = $api_instance->modifyProduct(id => $id, body => $body);
     print Dumper($result);
 };
 if ($@) {
@@ -8071,12 +8408,12 @@ from pprint import pprint
 
 # create an instance of the API class
 api_instance = swagger_client.DefaultApi()
-body =  # ProductModifyRequest | 
 id = 789 # Long | 
+body =  # ProductModifyRequest |  (optional)
 
 try: 
     # 상품정보 수정
-    api_response = api_instance.modify_product(body, id)
+    api_response = api_instance.modify_product(id, body=body)
     pprint(api_response)
 except ApiException as e:
     print("Exception when calling DefaultApi->modifyProduct: %s\n" % e)</code></pre>
@@ -8122,7 +8459,7 @@ except ApiException as e:
                                 <th width="150px">Name</th>
                                 <th>Description</th>
                               </tr>
-                                <tr><td style="width:150px;">body <span style="color:red;">*</span></td>
+                                <tr><td style="width:150px;">body </td>
                                 <td>
                                 
                                 
@@ -8135,8 +8472,7 @@ except ApiException as e:
         "$ref" : "#/components/schemas/ProductModifyRequest"
       }
     }
-  },
-  "required" : true
+  }
 };
                                   var schema = schemaWrapper.content["application/json"].schema;
                                   if (schema.$ref != null) {
