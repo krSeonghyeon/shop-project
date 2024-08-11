@@ -166,13 +166,12 @@ class DuplicationTests {
                 .price(2000000L)
                 .stock(100)
                 .shippingCost(3000)
-                .status(ProductStatus.판매중)
                 .build();
         product = productRepository.save(product);
 
         Payment payment = Payment.builder()
                 .transactionId("payment1234")
-                .amount(2000000L)
+                .amount(2003000L)
                 .method(PaymentMethod.카드)
                 .status(PaymentStatus.정상결제)
                 .build();

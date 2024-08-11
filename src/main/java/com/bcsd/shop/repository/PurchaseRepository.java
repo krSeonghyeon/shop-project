@@ -7,6 +7,7 @@ import java.util.List;
 
 public interface PurchaseRepository extends JpaRepository<Purchase, Long>, PurchaseRepositoryCustom {
 
+    void deleteByProductId(Long productId);
     List<Purchase> findAllByProductId(Long productId);
     List<Purchase> findAllByUserId(Long userId);
     boolean existsByPaymentId(Long paymentId);

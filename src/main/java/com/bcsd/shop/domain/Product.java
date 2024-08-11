@@ -48,7 +48,7 @@ public class Product {
     private Integer stock;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "status", nullable = false, insertable = false, columnDefinition = "ENUM('판매예정', '판매중', '판매중지', '품절') DEFAULT '판매예정'")
+    @Column(name = "status", nullable = false, insertable = false, columnDefinition = "ENUM('판매예정', '판매중', '판매중지', '품절') DEFAULT '판매중'")
     private ProductStatus status;
 
     @Column(name = "created_at", nullable = false, insertable = false, updatable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
